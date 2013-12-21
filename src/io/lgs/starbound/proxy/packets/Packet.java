@@ -1,5 +1,9 @@
 package io.lgs.starbound.proxy.packets;
 
+import io.lgs.starbound.util.ByteArrayDataInput;
+import io.lgs.starbound.util.IntHashMap;
+import io.lgs.starbound.util.Util;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.EOFException;
@@ -8,9 +12,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import io.lgs.starbound.util.IntHashMap;
-import io.lgs.starbound.util.Util;
 
 public abstract class Packet {
 	
@@ -68,7 +69,50 @@ public abstract class Packet {
 	public final int getPacketId() {
 		return ((Integer)packetClassToIdMap.get(this.getClass())).intValue();
 	}
-	
+
+	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput)
+			throws IOException {
+		return fetchRawPacket(dataInput, null);
+	}
+
+	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput,
+			RawPacket pkt) throws IOException {
+		if (pkt == null) {
+			pkt = new RawPacket();
+			pkt.type = dataInput.readVLQ();
+			pkt.data_length = dataInput.readSVLQ();
+
+			if (pkt.data_length < 0) {
+				pkt.data_length = (-pkt.data_length);
+				pkt.zlib = true;
+			}
+
+			pkt.data = new byte[pkt.data_length];
+			pkt.data_pos = dataInput.readBytes(pkt.data);
+
+			pkt.round_length = dataInput.getPosition();
+
+			if (pkt.data_pos == pkt.data_length) {
+				pkt.eop = true;
+				return pkt;
+			}
+		} else if (!pkt.eop) {
+			pkt.data_pos += dataInput.readBytes(pkt.data, pkt.data_pos,
+					pkt.data_length - pkt.data_pos);
+
+			pkt.round_length = dataInput.getPosition();
+
+			if (pkt.data_pos == pkt.data_length) {
+				pkt.eop = true;
+				return pkt;
+			} else {
+				pkt.eop = false;
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * Read a packet, prefixed by its ID, from the data stream.
 	 */

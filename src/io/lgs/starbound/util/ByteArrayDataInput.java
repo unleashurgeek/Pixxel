@@ -39,6 +39,28 @@ public class ByteArrayDataInput implements DataInput {
 		return Util.decodeZigZag32(readVLQ());
 	}
 
+	public int readBytes(byte[] b) {
+		return readBytes(b, 0, b.length);
+	}
+
+	public int readBytes(byte[] b, int off, int len) {
+		int i = off;
+
+		try {
+			for (i = off; i < off + len; i++) {
+				b[i] = buffer.get();
+			}
+		} catch (BufferUnderflowException e) {
+			return i;
+		}
+
+		return i;
+	}
+
+	public int getPosition() {
+		return buffer.position();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
