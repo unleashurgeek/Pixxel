@@ -120,12 +120,12 @@ public abstract class Packet {
 	/**
 	 * Abstract. Reads the raw packet data from the data stream.
 	 */
-	protected abstract void readPacketData(DataInput dataInput) throws IOException;
+	public abstract void readPacketData(DataInput dataInput) throws IOException;
 	
 	/**
 	 * Abstract. Writes the raw packet data to the data stream.
 	 */
-	protected abstract void writePacketData(DataOutput dataOutput) throws IOException;
+	public abstract void writePacketData(DataOutput dataOutput) throws IOException;
 	
 	/**
 	 * Abstract. Passes this packet on to the PacketHandler for processing.
