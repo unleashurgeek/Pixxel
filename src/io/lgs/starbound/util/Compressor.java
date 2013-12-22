@@ -64,11 +64,14 @@ public class Compressor {
 
 		int bufferSizeInBytes = numberOfBytesToDecompress;
 
+		int numberOfBytesDecompressedSoFar = 0;
 		List<Byte> bytesDecompressedSoFar = new ArrayList<Byte>();
 
 		try
 		{
-			while (inflater.needsInput() == false)
+			// TODO: CHeck this
+			//while (inflater.needsInput() == false)
+			while (numberOfBytesDecompressedSoFar < bufferSizeInBytes)
 			{
 				byte[] bytesDecompressedBuffer = new byte[bufferSizeInBytes];
 
@@ -76,6 +79,8 @@ public class Compressor {
 				(
 					bytesDecompressedBuffer
 				);
+				
+				numberOfBytesDecompressedSoFar += numberOfBytesDecompressedThisTime;
 
 				for (int b = 0; b < numberOfBytesDecompressedThisTime; b++)
 				{

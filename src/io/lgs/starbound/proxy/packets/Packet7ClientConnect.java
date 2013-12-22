@@ -2,16 +2,17 @@ package io.lgs.starbound.proxy.packets;
 
 import io.lgs.starbound.util.ByteArrayDataInput;
 import io.lgs.starbound.util.ByteArrayDataOutputStream;
+import io.lgs.starbound.util.Util;
 
 import java.io.IOException;
 
 public class Packet7ClientConnect extends Packet {
 
 	public int unk1_length;
-	public byte[] unk1;
-	public int unk2_length; // not sure about this was 0101 could be fixed
-	public byte[] unk2; // not sure about this
-	public byte[] uuid;
+	public byte[] unk1; // i really dont know what this bytearray is for
+	public int claim_length;
+	public byte[] claim; // something todo with attemptAuth config value / ValidClaim
+	public String uuid; // i think string is better then byte[]
 	public String username;
 	public String race;
 	public byte[] playerdata; // Ship, Player (unknwon length, could be
@@ -28,13 +29,14 @@ public class Packet7ClientConnect extends Packet {
 		unk1 = new byte[unk1_length];
 		dataInput.readFully(unk1);
 
-		unk2_length = dataInput.readVLQ();
+		claim_length = dataInput.readVLQ();
 
-		unk2 = new byte[unk2_length];
-		dataInput.readFully(unk2);
+		claim = new byte[claim_length];
+		dataInput.readFully(claim);
 
-		uuid = new byte[16];
-		dataInput.readFully(uuid);
+		byte[] t_uuid = new byte[16];
+		dataInput.readFully(t_uuid);
+		uuid = Util.bytesToHex(t_uuid);
 
 		username = dataInput.readString();
 
