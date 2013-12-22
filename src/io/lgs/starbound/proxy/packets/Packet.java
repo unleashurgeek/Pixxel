@@ -29,6 +29,8 @@ public abstract class Packet {
 	/** List of the server's packet IDs */
 	private static Set<Integer> serverPacketIdList = new HashSet<Integer>();
 	
+	private boolean isCompressed = false;
+	
 	/**
 	 * Adds a two way mapping between the packet ID and packet class.
 	 */
@@ -112,12 +114,16 @@ public abstract class Packet {
 		byte[] data = baos.toByteArray();
 		bados.close();
 		
-		if (packet.getPacketSize() >= 253) {
+		if (packet.getPacketSize() > 255) {
 			data = Compressor.compress(data);
+			packet.isCompressed = true;
 		}
 		
 		dataOutput.writeVLQ(packet.getPacketId());
-		dataOutput.writeSVLQ(packet.getPacketSize());
+		if (packet.isCompressed)
+			dataOutput.writeSVLQ(-packet.getPacketSize());
+		else
+			dataOutput.writeSVLQ(packet.getPacketSize());
 		dataOutput.writeBytes(data);
 	}
 	
