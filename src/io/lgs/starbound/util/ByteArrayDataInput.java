@@ -57,6 +57,19 @@ public class ByteArrayDataInput implements DataInput {
 		return i;
 	}
 
+	public String readString() throws IOException {
+		try {
+			int length = readVLQ();
+			byte[] tmp = new byte[length];
+			readFully(tmp);
+			return new String(tmp);
+		} catch (BufferUnderflowException e) {
+			throw new EOFException();
+		} catch (IndexOutOfBoundsException e) {
+			throw new IllegalArgumentException();
+		}
+	}
+
 	public int getPosition() {
 		return buffer.position();
 	}

@@ -1,76 +1,78 @@
 package io.lgs.starbound.proxy.packets;
 
-import java.io.DataInput;
+import io.lgs.starbound.util.ByteArrayDataInput;
+
 import java.io.DataOutput;
 import java.io.IOException;
 
 public class Packet5ChatReceive extends Packet {
 
 	/** Color of the Chat. */
-	public byte color;
-	
-	/** Length of channel name */
-	public byte channel_length;
-	
+	public int color;
+
 	/** Channel Name */
 	public String channel;
-	
-	/** Length of Receiver  */
-	public byte reciever_length;
 
 	/** Receiver name */
-	public String receiver; 
-	
+	public String receiver;
+
 	/** Connection # of sender */
-	public byte connection_number;
-	
-	/** Sender name length */
-	public byte sender_length;
-	
+	public int connection_number;
+
 	/** Sender name */
 	public String sender;
-	
-	/** Message length */
-	public byte message_length;
-	
+
 	/** Message */
 	public String message;
-	
+
 	public Packet5ChatReceive() {
-		//TOOO: Read input
+		// TOOO: Read input
 	}
-	
+
 	@Override
-	public void readPacketData(DataInput dataInput) throws IOException {
-		// TODO Auto-generated method stub
-		
+	public void readPacketData(ByteArrayDataInput dataInput) throws IOException {
+		color = dataInput.readVLQ();
+		channel = dataInput.readString();
+
+		if (channel.length() == 0) {
+			dataInput.skipBytes(1);
+		}
+
+		receiver = dataInput.readString();
+
+		if (receiver.length() == 0) {
+			dataInput.skipBytes(1);
+		}
+
+		connection_number = dataInput.readVLQ();
+		sender = dataInput.readString();
+
+		if (sender.length() == 0) {
+			dataInput.skipBytes(1);
+		}
+
+		message = dataInput.readString();
+
+		if (message.length() == 0) {
+			dataInput.skipBytes(1);
+		}
 	}
 
 	@Override
 	public void writePacketData(DataOutput dataOutput) throws IOException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void processPacket(PacketHandler packetHandler) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public int getPacketSize() {
-		int base = 0;
-		if (channel_length == (byte)0x00)
-			base++;
-		if (reciever_length == (byte)0x00)
-			base++;
-		if (sender_length == (byte)0x00)
-			base++;
-		if (message_length == (byte)0x00)
-			base++;
-		
-		return base + 6 + channel_length + reciever_length + sender_length + message_length;
+		return 0;
 	}
 
 }

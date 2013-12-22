@@ -1,6 +1,7 @@
 package io.lgs.starbound.proxy.packets;
 
-import java.io.DataInput;
+import io.lgs.starbound.util.ByteArrayDataInput;
+
 import java.io.DataOutput;
 import java.io.IOException;
 
@@ -14,7 +15,7 @@ public class Packet1ProtocolVersion extends Packet {
 	}
 
 	@Override
-	public void readPacketData(DataInput dataInput) throws IOException {
+	public void readPacketData(ByteArrayDataInput dataInput) throws IOException {
 		version = dataInput.readInt();
 	}
 

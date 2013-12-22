@@ -4,9 +4,7 @@ import io.lgs.starbound.util.ByteArrayDataInput;
 import io.lgs.starbound.util.IntHashMap;
 import io.lgs.starbound.util.Util;
 
-import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -114,30 +112,27 @@ public abstract class Packet {
 	}
 
 	/**
-	 * Read a packet, prefixed by its ID, from the data stream.
+	 * Parse a packet, prefixed by its ID, from the raw packet data.
 	 */
-	public static Packet readPacket(DataInput dataInput, boolean isServer) throws IOException {
+	public static Packet parsePacket(RawPacket pkt, boolean isServer)
+			throws IOException {
 		Packet packet = null;
-		int packetID;
-		try {
-			packetID = dataInput.readUnsignedByte();
-			// TODO: Rewrite VLQ to Variant with adaptive num size.
-			// TODO: Read VLQ. Need to determine VLQ size.
-			// TODO: Detect and decrypt zlib compression.
-			
-			if (isServer && !serverPacketIdList.contains(packetID) || !isServer && !clientPacketIdList.contains(packetID)) {
-				return null;
-			}
-			
-			packet = getNewPacket(packetID);
-			if (packet == null)
-				return null;
-			
-			packet.readPacketData(dataInput);
-		} catch (EOFException e) {
-			e.printStackTrace();
+		int packetID = pkt.type;
+
+		if (isServer && !serverPacketIdList.contains(packetID) || !isServer
+				&& !clientPacketIdList.contains(packetID)) {
+			return null;
 		}
-		
+
+		packet = getNewPacket(packetID);
+		if (packet == null)
+			return null;
+
+		if (pkt.zlib)
+			pkt.data = Util.zlibDecompress(pkt.data);
+
+		packet.readPacketData(new ByteArrayDataInput(pkt.data));
+
 		return packet;
 	}
 	
@@ -189,6 +184,9 @@ public abstract class Packet {
 	}
 	
 	static {
+		addIdClassMapping(1, true, false, Packet1ProtocolVersion.class);
+		addIdClassMapping(2, true, false, Packet2ConnectResponse.class);
 		addIdClassMapping(5, true, false, Packet5ChatReceive.class);
+		addIdClassMapping(7, true, false, Packet7ClientConnect.class);
 	}
 }

@@ -5,26 +5,33 @@ import io.lgs.starbound.util.ByteArrayDataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class Packet2ConnectResponse extends Packet {
+public class Packet12ClientContext extends Packet {
 
-	/** Unknown */
-	public byte unk1;
+	// Not finished yet, based on my packet
 
-	/** Unknown */
-	public String unk2;
+	// 4 unknown bytes, first one is a letter
+	public String unk1; // argument
+	// 2 unknown bytes
+	public String unk2; // player
+	// 1 unknown bytes
+	public String username; // Seberoth
+	public String unk3; // handler
+	// 1 unknown bytes
+	public String unk4; // team.pollInvitation
+	public String unk5; // id
+	// 2 unknown bytes
+	public String unk6; // command
+	// 1 unknown bytes
+	public String unk7; // request
 
-	public Packet2ConnectResponse() {
-		// TODO: Read input
+	public Packet12ClientContext() {
+
 	}
 
 	@Override
 	public void readPacketData(ByteArrayDataInput dataInput) throws IOException {
-		unk1 = dataInput.readByte();
-		unk2 = dataInput.readString();
+		// TODO Auto-generated method stub
 
-		if (unk2.length() == 0) {
-			dataInput.skipBytes(1);
-		}
 	}
 
 	@Override
