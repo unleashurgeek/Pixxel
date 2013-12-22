@@ -2,7 +2,7 @@ package io.lgs.starbound.entity;
 
 import io.lgs.starbound.Wrapper;
 import io.lgs.starbound.proxy.ThreadClient;
-import io.lgs.starbound.proxy.packets.Packet5ChatSend;
+import io.lgs.starbound.proxy.packets.Packet11ChatSend;
 import io.lgs.starbound.util.ChatColor;
 
 import java.net.InetAddress;
@@ -52,7 +52,7 @@ public class Player {
 	}
 	
 	public void sendMessage(String message, ChatColor color) {
-		client.sendPacketToClient(new Packet5ChatSend(color, this.getName(), message));
+		client.sendPacketToClient(new Packet11ChatSend(message));
 		// Write sends. Main use of this will be for plugins using  
 	}
 }

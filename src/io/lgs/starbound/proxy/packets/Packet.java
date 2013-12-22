@@ -151,7 +151,8 @@ public abstract class Packet {
 	static {
 		addIdClassMapping(1, true, false, Packet1ProtocolVersion.class);
 		addIdClassMapping(2, true, false, Packet2ConnectResponse.class);
-		addIdClassMapping(5, true, false, Packet5ChatSend.class);
+		addIdClassMapping(5, true, false, Packet5ChatReceive.class);
 		addIdClassMapping(7, true, false, Packet7ClientConnect.class);
+		addIdClassMapping(11, true, false, Packet11ChatSend.class);
 	}
 }

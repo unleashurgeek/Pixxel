@@ -58,6 +58,12 @@ public class ByteArrayDataInput implements DataInput {
 	public String readString() throws IOException {
 		try {
 			int length = readVLQ();
+			
+			if (length == 0) {
+				skipBytes(1);
+				return "";
+			}
+			
 			byte[] tmp = new byte[length];
 			readFully(tmp);
 			return new String(tmp);

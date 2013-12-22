@@ -6,7 +6,7 @@ import io.lgs.starbound.util.ChatColor;
 
 import java.io.IOException;
 
-public class Packet5ChatSend extends Packet {
+public class Packet5ChatReceive extends Packet {
 
 	/** Color of the Chat. */
 	public byte color;
@@ -26,7 +26,7 @@ public class Packet5ChatSend extends Packet {
 	/** Message */
 	public String message;
 
-	public Packet5ChatSend(ChatColor color, String sender, String message) {
+	public Packet5ChatReceive(ChatColor color, String sender, String message) {
 		this.color  = color.getByte();
 		this.sender =  sender;
 		this.message = message;
@@ -36,29 +36,10 @@ public class Packet5ChatSend extends Packet {
 	public void readPacketData(ByteArrayDataInput dataInput) throws IOException {
 		color = dataInput.readByte();
 		channel = dataInput.readString();
-
-		if (channel.length() == 0) {
-			dataInput.skipBytes(1);
-		}
-
 		receiver = dataInput.readString();
-
-		if (receiver.length() == 0) {
-			dataInput.skipBytes(1);
-		}
-
 		connection_number = dataInput.readVLQ();
 		sender = dataInput.readString();
-
-		if (sender.length() == 0) {
-			dataInput.skipBytes(1);
-		}
-
 		message = dataInput.readString();
-
-		if (message.length() == 0) {
-			dataInput.skipBytes(1);
-		}
 	}
 
 	@Override
@@ -73,7 +54,7 @@ public class Packet5ChatSend extends Packet {
 
 	@Override
 	public void processPacket(PacketHandler packetHandler) {
-		packetHandler.handleChatSend(this);
+		// packetHandler.handleChatSend(this);
 	}
 
 	@Override
@@ -97,7 +78,7 @@ public class Packet5ChatSend extends Packet {
 		if (message.length() == 0)
 			size += 2;
 		else
-			size += sender.length() + 1;
+			size += message.length() + 1;
 		
 		// Chat Color
 		size += 1;

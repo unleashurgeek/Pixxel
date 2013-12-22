@@ -51,7 +51,7 @@ public class AegisServer {
 	
 	// Need the Starbound.config location
 	public int getMaxPlayers() {
-		return ;;
+		return 0;
 	}
 	
 	/** 

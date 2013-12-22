@@ -13,7 +13,7 @@ public class PacketHandler {
 		this.player = client.getPlayer();
 	}
 	
-	public void handleChatSend(Packet5ChatSend packet) {
+	public void handleChatSend(Packet11ChatSend packet) {
 		
 	}
 }
