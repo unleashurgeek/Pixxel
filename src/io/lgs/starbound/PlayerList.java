@@ -3,6 +3,7 @@ package io.lgs.starbound;
 import io.lgs.starbound.entity.Player;
 import io.lgs.starbound.file.BanList;
 import io.lgs.starbound.proxy.ThreadClient;
+import io.lgs.starbound.proxy.packets.Packet7ClientConnect;
 
 import java.io.File;
 import java.io.IOException;

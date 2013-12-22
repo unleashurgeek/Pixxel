@@ -12,4 +12,8 @@ public class PacketHandler {
 		this.client = client;
 		this.player = client.getPlayer();
 	}
+	
+	public void handleChatSend(Packet5ChatSend packet) {
+		
+	}
 }

@@ -7,6 +7,7 @@ import java.util.Set;
 import io.lgs.starbound.entity.Player;
 import io.lgs.starbound.file.ServerProperties;
 import io.lgs.starbound.proxy.ThreadClient;
+import io.lgs.starbound.util.ChatColor;
 
 public class AegisServer {
 	private final String wrapperVersion = "1.0b";
@@ -56,11 +57,11 @@ public class AegisServer {
 	/** 
 	 * Sends message to all players on server. Returns number of players sent to.
 	 */
-	public int broadcastMessage(String message) {
+	public int broadcastMessage(String message, ChatColor color) {
 		Player[] players = getOnlinePlayers();
 		int count = 0;
 		for (Player player : players) {
-			player.sendMessage(message);
+			player.sendMessage(message, color);
 			count++;
 		}
 		return count;
@@ -123,11 +124,11 @@ public class AegisServer {
 	}
 	
 	// returns true if banned, false if not.
-	public Boolean banIP(String address) {
+	public boolean banIP(String address) {
 		return serverProperties.banFile().addBan(address);
 	}
 	
-	public Boolean unbanIP(String address) {
+	public boolean unbanIP(String address) {
 		return serverProperties.banFile().removeBan(address);
 	}
 }

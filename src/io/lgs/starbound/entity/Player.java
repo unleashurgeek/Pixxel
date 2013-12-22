@@ -2,7 +2,8 @@ package io.lgs.starbound.entity;
 
 import io.lgs.starbound.Wrapper;
 import io.lgs.starbound.proxy.ThreadClient;
-import io.lgs.starbound.proxy.packets.Packet5ChatReceive;
+import io.lgs.starbound.proxy.packets.Packet5ChatSend;
+import io.lgs.starbound.util.ChatColor;
 
 import java.net.InetAddress;
 
@@ -10,7 +11,7 @@ public class Player {
 	private final String username;
 	private final ThreadClient client;
 	private String UUID;
-	private Boolean op = false;
+	private boolean op = false;
 	
 	public Player(String username, ThreadClient client) {
 		this.username = username;
@@ -34,16 +35,15 @@ public class Player {
 		return client.getClientSocket().getInetAddress();
 	}
 	
-	public Boolean isOp() {
+	public boolean isOp() {
 		return op;
 	}
 	
-	public void setOp(Boolean op) {
+	public void setOp(boolean op) {
 		this.op = op;
 	}
 	
 	public void kickPlayer() {
-		
 		// TODO: replace with sending disconnect packet.
 		client.disconnect();
 		Wrapper.getServer().playerList.disconnect();
@@ -51,8 +51,8 @@ public class Player {
 		// send disconnect method in PlayerList?
 	}
 	
-	public void sendMessage(String message) {
-		client.sendPacketToClient(new Packet5ChatReceive(this.getName(), message));
+	public void sendMessage(String message, ChatColor color) {
+		client.sendPacketToClient(new Packet5ChatSend(color, this.getName(), message));
 		// Write sends. Main use of this will be for plugins using  
 	}
 }

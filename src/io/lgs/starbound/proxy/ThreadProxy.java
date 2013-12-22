@@ -33,6 +33,7 @@ public class ThreadProxy extends Thread {
 	}
 	 
 	public void kill() throws IOException {
+		Wrapper.getServer().kickAll();
 		serverSocket.close();
 	}
 }

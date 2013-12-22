@@ -13,7 +13,6 @@ public class StarboundServer {
 	private ThreadProxy proxy;
 	
 	public StarboundServer(ProcessBuilder starboundBuilder) {
-		//this.starboundBuilder = starboundBuilder;
 		BufferedReader starboundConsole;
 		
 		try {
@@ -46,6 +45,7 @@ public class StarboundServer {
 			e.printStackTrace();
 		}
 		starbound.destroy();
+		Wrapper.getServer().playerList.clients.clear();
 		// TODO: Clear all data sheats (Players connected, etc)
 	}
 }

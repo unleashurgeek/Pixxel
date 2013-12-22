@@ -85,15 +85,15 @@ public class ServerProperties {
 		return banFile;
 	}
 	
-	public Boolean showWarnings() {
+	public boolean showWarnings() {
 		return showWarnings;
 	}
 	
-	public Boolean showLiquidError() {
+	public boolean showLiquidError() {
 		return showLiquidError;
 	}
 	
-	public Boolean showError() {
+	public boolean showError() {
 		return showError;
 	}
 }

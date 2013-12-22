@@ -45,7 +45,7 @@ public class BanList extends File {
 		}
 	}
 	
-	public Boolean addBan(String ip) {
+	public boolean addBan(String ip) {
 		ip = ip.trim();
 		
 		if (!ip.matches(IPADDRESS_PATTERN))
@@ -61,7 +61,7 @@ public class BanList extends File {
 		}
 	}
 	
-	public Boolean removeBan(String ip) {
+	public boolean removeBan(String ip) {
 		ip = ip.trim();
 		boolean isRemoved = false;
 		

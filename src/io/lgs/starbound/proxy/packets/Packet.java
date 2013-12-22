@@ -1,9 +1,12 @@
 package io.lgs.starbound.proxy.packets;
 
 import io.lgs.starbound.util.ByteArrayDataInput;
+import io.lgs.starbound.util.ByteArrayDataOutputStream;
+import io.lgs.starbound.util.Compressor;
 import io.lgs.starbound.util.IntHashMap;
-import io.lgs.starbound.util.Util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,7 +33,7 @@ public abstract class Packet {
 	 * Adds a two way mapping between the packet ID and packet class.
 	 */
 	@SuppressWarnings("rawtypes")
-	public static void addIdClassMapping(int packetID, boolean isClientPacket, boolean isServerPacket, Class packetClass) {
+	public static void addIdClassMapping(int packetID, boolean isToClientPacket, boolean isToServerPacket, Class packetClass) {
 		if (packetIdToClassMap.containsItem(packetID)) {
 			throw new IllegalArgumentException("Duplicated packet id: " + packetID);
 		} else if (packetClassToIdMap.containsKey(packetClass)) {
@@ -39,10 +42,10 @@ public abstract class Packet {
 			packetIdToClassMap.addKey(packetID, packetClass);
 			packetClassToIdMap.put(packetClass, packetID);
 			
-			if (isClientPacket)
+			if (isToClientPacket)
 				clientPacketIdList.add(packetID);
 			
-			if (isServerPacket)
+			if (isToServerPacket)
 				serverPacketIdList.add(packetID);
 		}
 	}
@@ -68,103 +71,65 @@ public abstract class Packet {
 		return ((Integer)packetClassToIdMap.get(this.getClass())).intValue();
 	}
 
-	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput)
-			throws IOException {
-		return fetchRawPacket(dataInput, null);
-	}
-
-	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput,
-			RawPacket pkt) throws IOException {
-		if (pkt == null) {
-			pkt = new RawPacket();
-			pkt.type = dataInput.readVLQ();
-			pkt.data_length = dataInput.readSVLQ();
-
-			if (pkt.data_length < 0) {
-				pkt.data_length = (-pkt.data_length);
-				pkt.zlib = true;
-			}
-
-			pkt.data = new byte[pkt.data_length];
-			pkt.data_pos = dataInput.readBytes(pkt.data);
-
-			pkt.round_length = dataInput.getPosition();
-
-			if (pkt.data_pos == pkt.data_length) {
-				pkt.eop = true;
-				return pkt;
-			}
-		} else if (!pkt.eop) {
-			pkt.data_pos += dataInput.readBytes(pkt.data, pkt.data_pos,
-					pkt.data_length - pkt.data_pos);
-
-			pkt.round_length = dataInput.getPosition();
-
-			if (pkt.data_pos == pkt.data_length) {
-				pkt.eop = true;
-				return pkt;
-			} else {
-				pkt.eop = false;
-			}
-		}
-
-		return null;
-	}
-
 	/**
 	 * Parse a packet, prefixed by its ID, from the raw packet data.
 	 */
-	public static Packet parsePacket(RawPacket pkt, boolean isServer)
-			throws IOException {
+	public static Packet readPacket(DataInput dataInput, boolean isServer) throws IOException {
 		Packet packet = null;
-		int packetID = pkt.type;
-
+		RawPacket rawPacket = new RawPacket((ByteArrayDataInput) dataInput);
+		int packetID = rawPacket.type;
+		
 		if (isServer && !serverPacketIdList.contains(packetID) || !isServer
 				&& !clientPacketIdList.contains(packetID)) {
 			return null;
 		}
-
+		
 		packet = getNewPacket(packetID);
 		if (packet == null)
 			return null;
-
-		if (pkt.zlib)
-			pkt.data = Util.zlibDecompress(pkt.data);
-
-		packet.readPacketData(new ByteArrayDataInput(pkt.data));
-
+		
+		if (rawPacket.zlib) {
+			rawPacket.data = Compressor.decompress(rawPacket.data);
+		}
+		
+		packet.readPacketData((ByteArrayDataInput) dataInput);
+		
 		return packet;
 	}
 	
 	public void writePacket(DataOutput dataOutput) throws IOException {
-		Packet packet = this;
-		dataOutput.write(packet.getPacketId());
-		
-		// TODO: Change to Adaptive Variant packetSize
-		dataOutput.write(Util.encodeVLQ(packet.getPacketSize()));
-		packet.writePacketData(dataOutput);
+		Packet.writePacket(this, (ByteArrayDataOutputStream) dataOutput);
 	}
 	
 	/**
 	 * Writes a packet, prefixed by its ID, to the data stream.
 	 */
-	public static void writePacket(Packet packet, DataOutput dataOutput) throws IOException {
-		dataOutput.write(packet.getPacketId());
+	public static void writePacket(Packet packet, ByteArrayDataOutputStream dataOutput) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayDataOutputStream bados = new ByteArrayDataOutputStream(baos);
+		packet.writePacket(bados);
+		bados.flush();
+		byte[] data = baos.toByteArray();
+		bados.close();
 		
-		// TODO: Change to Adaptive Variant packetSize
-		dataOutput.write(Util.encodeVLQ(packet.getPacketSize()));
-		packet.writePacketData(dataOutput);
+		if (packet.getPacketSize() >= 253) {
+			data = Compressor.compress(data);
+		}
+		
+		dataOutput.writeVLQ(packet.getPacketId());
+		dataOutput.writeSVLQ(packet.getPacketSize());
+		dataOutput.writeBytes(data);
 	}
 	
 	/**
 	 * Abstract. Reads the raw packet data from the data stream.
 	 */
-	public abstract void readPacketData(DataInput dataInput) throws IOException;
+	public abstract void readPacketData(ByteArrayDataInput dataInput) throws IOException;
 	
 	/**
 	 * Abstract. Writes the raw packet data to the data stream.
 	 */
-	public abstract void writePacketData(DataOutput dataOutput) throws IOException;
+	public abstract void writePacketData(ByteArrayDataOutputStream dataOutput) throws IOException;
 	
 	/**
 	 * Abstract. Passes this packet on to the PacketHandler for processing.
@@ -172,7 +137,7 @@ public abstract class Packet {
 	public abstract void processPacket(PacketHandler packetHandler);
 	
 	/**
-	 * Abstract. Return the size of (not counting the header and VLQ).
+	 * Abstract. Return the size of packet (not counting the header and VLQ).
 	 */
 	public abstract int getPacketSize();
 	
@@ -186,7 +151,7 @@ public abstract class Packet {
 	static {
 		addIdClassMapping(1, true, false, Packet1ProtocolVersion.class);
 		addIdClassMapping(2, true, false, Packet2ConnectResponse.class);
-		addIdClassMapping(5, true, false, Packet5ChatReceive.class);
+		addIdClassMapping(5, true, false, Packet5ChatSend.class);
 		addIdClassMapping(7, true, false, Packet7ClientConnect.class);
 	}
 }

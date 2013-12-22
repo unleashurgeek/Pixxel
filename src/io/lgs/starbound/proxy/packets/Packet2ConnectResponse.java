@@ -1,8 +1,8 @@
 package io.lgs.starbound.proxy.packets;
 
 import io.lgs.starbound.util.ByteArrayDataInput;
+import io.lgs.starbound.util.ByteArrayDataOutputStream;
 
-import java.io.DataOutput;
 import java.io.IOException;
 
 public class Packet2ConnectResponse extends Packet {
@@ -28,7 +28,7 @@ public class Packet2ConnectResponse extends Packet {
 	}
 
 	@Override
-	public void writePacketData(DataOutput dataOutput) throws IOException {
+	public void writePacketData(ByteArrayDataOutputStream dataOutput) throws IOException {
 		// TODO Auto-generated method stub
 
 	}

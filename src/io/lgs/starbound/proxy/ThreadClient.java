@@ -2,6 +2,7 @@ package io.lgs.starbound.proxy;
 
 import io.lgs.starbound.entity.Player;
 import io.lgs.starbound.proxy.packets.Packet;
+import io.lgs.starbound.proxy.packets.PacketHandler;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -12,12 +13,14 @@ public class ThreadClient extends Thread {
 	private final Socket serverSocket;
 	private ServerStreams serverStreams;
 	private ClientStreams clientStreams;
+	private PacketHandler packetHandler;
 	
 	private Player player;
 	
 	public ThreadClient(Socket clientSocket, Socket serverSocket) {
 		this.clientSocket = clientSocket;
 		this.serverSocket = serverSocket;
+		this.packetHandler = new PacketHandler(this);
 	}
 	
 	@Override
@@ -30,12 +33,11 @@ public class ThreadClient extends Thread {
 			clientStreams.setInputStream(clientSocket.getInputStream());
 			clientStreams.setOutputStream(clientSocket.getOutputStream());
 			
-			// TODO: merge ThreadForwardServer and ThreadForwardClient to ThreadForward
 			// Packets Client to Server
-			ThreadForwardServer forwardServer = new ThreadForwardServer(this, clientStreams.getInputStream(), serverStreams.getOutputStream());
+			ThreadForward forwardServer = new ThreadForward(this, clientStreams.getInputStream(), serverStreams.getOutputStream(), true);
 			
 			// Packets Server to Client
-			ThreadForwardClient forwardClient =  new ThreadForwardClient(this, serverStreams.getInputStream(), clientStreams.getOutputStream());
+			ThreadForward forwardClient =  new ThreadForward(this, serverStreams.getInputStream(), clientStreams.getOutputStream(), false);
 			
 			// Start Forwards
 			forwardServer.start();
@@ -57,7 +59,9 @@ public class ThreadClient extends Thread {
 		return player;
 	}
 	
-	// TODO: Create packet handler
+	public PacketHandler getPacketHandler() {
+		return packetHandler;
+	}
 	
 	public Socket getClientSocket() {
 		return clientSocket;
@@ -87,7 +91,6 @@ public class ThreadClient extends Thread {
 		try {
 			packet.writePacket(clientStreams.getOutputStream());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

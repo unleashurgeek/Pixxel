@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
-// TODO: Hope this is ok, if not...
-
 public class ByteArrayDataInput implements DataInput {
 
 	private final byte[] data;

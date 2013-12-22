@@ -8,10 +8,9 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 public class Compressor {
-	public Compressor()
-	{}
+	private Compressor() {}
 
-	public byte[] compress(byte[] bytesToCompress)
+	public static byte[] compress(byte[] bytesToCompress)
 	{		
 		Deflater deflater = new Deflater();
 		deflater.setInput(bytesToCompress);
@@ -35,27 +34,20 @@ public class Compressor {
 		return returnValues;
 	}
 
-	public byte[] compress(String stringToCompress)
+	public static byte[] compress(String stringToCompress)
 	{		
 		byte[] returnValues = null;
 
-		try
-		{
-
-			returnValues = this.compress
-			(
-				stringToCompress.getBytes("UTF-8")
-			);
-		}
-		catch (UnsupportedEncodingException uee)
-		{
+		try {
+			returnValues = compress(stringToCompress.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException uee) {
 			uee.printStackTrace();
 		}
 
 		return returnValues;
 	}
 
-	public byte[] decompress(byte[] bytesToDecompress)
+	public static byte[] decompress(byte[] bytesToDecompress)
 	{
 		byte[] returnValues = null;
 
@@ -108,12 +100,9 @@ public class Compressor {
 		return returnValues;
 	}
 
-	public String decompressToString(byte[] bytesToDecompress)
+	public static String decompressToString(byte[] bytesToDecompress)
 	{	
-		byte[] bytesDecompressed = this.decompress
-		(
-			bytesToDecompress
-		);
+		byte[] bytesDecompressed = decompress(bytesToDecompress);
 
 		String returnValue = null;
 
