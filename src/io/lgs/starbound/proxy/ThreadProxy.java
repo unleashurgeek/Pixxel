@@ -15,14 +15,19 @@ public class ThreadProxy extends Thread {
 	 @Override
 	public void run() {
 		 try {
-			serverSocket = new ServerSocket(21024);
+			serverSocket = new ServerSocket(21025);
 			
 			while (serverSocket.isBound() && !serverSocket.isClosed()) {
 				
 				Socket clientSocket = serverSocket.accept();
-				if (!clientSocket.getInetAddress().getHostAddress().equals("127.0.0.1")) {
-					System.out.println("proxy: Connection recieved from " + clientSocket.getInetAddress().getHostAddress());
-					Wrapper.getServer().playerList.attemptLogin(clientSocket);
+				System.out.println("proxy: Connection recieved from " + clientSocket.getInetAddress().getHostAddress());
+				Wrapper.getServer().playerList.attemptLogin(clientSocket);
+				try {
+					System.out.println("here");
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 			
