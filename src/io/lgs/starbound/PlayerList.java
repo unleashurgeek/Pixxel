@@ -3,6 +3,7 @@ package io.lgs.starbound;
 import io.lgs.starbound.entity.Player;
 import io.lgs.starbound.file.BanList;
 import io.lgs.starbound.file.ServerProperties;
+import io.lgs.starbound.proxy.ClientStreams;
 import io.lgs.starbound.proxy.ThreadClient;
 import io.lgs.starbound.proxy.packets.Packet;
 import io.lgs.starbound.proxy.packets.Packet7ClientConnect;
@@ -18,6 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class PlayerList {
 	public  final List<ThreadClient> clients = new CopyOnWriteArrayList<ThreadClient>();
 	private final BanList banList;
+	private boolean breakThreads = false;
 	
 	public PlayerList(StarboundServer starboundServer, ServerProperties properties) {
 		banList = properties.banFile();
@@ -27,45 +29,70 @@ public class PlayerList {
 		}
 	}
 	
+	
+	
 	public void attemptLogin(final Socket clientSocket) throws UnknownHostException, IOException {
 		if (banList.getBans() != null && banList.getBans().contains(clientSocket.getInetAddress().getHostAddress())) {
 			System.out.println("Here!");
 			return;
 		}
+		final Socket server = new Socket("127.0.0.1", 21024);
 		
-		 //new Thread(new Runnable() {
-			//@Override
-			//public void run() {
+		
+		// To Client
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				byte[] buffer = new byte[1460];
 				try {
-					Socket server = new Socket("127.0.0.1", 21024);
-					System.out.println("there?");
-					byte[] buffer = new byte[1460];
 					for (int size; (size = server.getInputStream().read(buffer)) != -1;) {
-						System.out.println(Arrays.toString(buffer));
+						clientSocket.getOutputStream().write(buffer, 0, size);
+						clientSocket.getOutputStream().flush();
+						
+						if (breakThreads)
+							break;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+		
+		// To Server
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				byte[] buffer = new byte[1460];
+				try {
+					for (int size; (size = clientSocket.getInputStream().read(buffer)) != -1;) {
 						if (buffer[0] == (byte)0x07) {
 							System.out.println("Perhaps here?");
 							Packet7ClientConnect packet = (Packet7ClientConnect) Packet.readPacket(new ByteArrayDataInput(buffer), true);
-							System.out.println("Here");
 							final ThreadClient client = new ThreadClient(clientSocket, server);
 							Player player = new Player(packet.username, packet.uuid, packet.race, client);
 							client.setPlayer(player);
 							
-							clientSocket.getOutputStream().write(buffer, 0, size);
-							clientSocket.getOutputStream().flush();
+							server.getOutputStream().write(buffer, 0, size);
+							server.getOutputStream().flush();
 							clients.add(client);
+							
+							breakThreads = true;
+							
 							client.start();
-							break;
+							if (breakThreads)
+								break;
 						} else {
-							System.out.println("There??");
-							clientSocket.getOutputStream().write(buffer, 0, size);
-							clientSocket.getOutputStream().flush();
+							server.getOutputStream().write(buffer, 0, size);
+							server.getOutputStream().flush();
 						}
+						
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			//}
-		///});
+			}
+		}).start();
 		
 		// TODO: Check if Player is Opped.
 		// TODO: Possibly changed List from clients to Players for security?
