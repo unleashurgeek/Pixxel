@@ -34,7 +34,7 @@ public class ServerProperties {
 	private File adminFile;
 	
 	/** File Bans.txt */
-	private File banFile;
+	private BanList banFile;
 	
 	public ServerProperties(File file) {
 		this.serverProperties = new Properties();
@@ -66,7 +66,7 @@ public class ServerProperties {
 		this.showLiquidError  = Boolean.valueOf(serverProperties.getProperty("showLiquidError", "false"));
 		this.showError        = Boolean.valueOf(serverProperties.getProperty("showError", "true"));
 		this.adminFile        = new File(serverProperties.getProperty("adminFile", "Admins.txt"));
-		this.banFile          = new File(serverProperties.getProperty("banFile", "Bans.txt"));
+		this.banFile          = new BanList(serverProperties.getProperty("banFile", "Bans.txt"));
 	}
 	
 	public String serverLocation() {
@@ -81,7 +81,7 @@ public class ServerProperties {
 		return adminFile;
 	}
 	
-	public File banFile() {
+	public BanList banFile() {
 		return banFile;
 	}
 	

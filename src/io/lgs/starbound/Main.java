@@ -3,7 +3,6 @@ package io.lgs.starbound;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Properties;
 
 import io.lgs.starbound.file.ServerProperties;
 
@@ -19,9 +18,10 @@ public class Main {
 		ProcessBuilder pb = new ProcessBuilder(serverProperties.serverLocation());
 		pb.redirectErrorStream(true);
 		
-		PlayerList playerList = new PlayerList();
-		
 		StarboundServer ss = new StarboundServer(pb);
+		
+		PlayerList playerList = new PlayerList(ss);
+		
 		new AegisServer(ss, playerList, serverProperties);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Set;
 
 import io.lgs.starbound.entity.Player;
 import io.lgs.starbound.file.ServerProperties;
+import io.lgs.starbound.proxy.ThreadClient;
 
 public class AegisServer {
 	private final String wrapperVersion = "1.0b";
@@ -38,11 +39,11 @@ public class AegisServer {
 	}
 	
 	public Player[] getOnlinePlayers() {
-		List<Player> online = playerList.players;
+		List<ThreadClient> online = playerList.clients;
 		Player[] players = new Player[online.size()];
 		
 		for (int i = 0; i < players.length; i++) {
-			players[i] = online.get(i);
+			players[i] = online.get(i).getPlayer();
 		}
 		return players;
 	}
@@ -118,14 +119,15 @@ public class AegisServer {
 	
 	// List all banned IPs
 	public Set<String> getBans() {
-		return ;;
+		return serverProperties.banFile().getBans();
 	}
 	
-	public void banIP(String address) {
-	 ;;;
+	// returns true if banned, false if not.
+	public Boolean banIP(String address) {
+		return serverProperties.banFile().addBan(address);
 	}
 	
-	public void unbanIP(String address) {
-		;;;
+	public Boolean unbanIP(String address) {
+		return serverProperties.banFile().removeBan(address);
 	}
 }

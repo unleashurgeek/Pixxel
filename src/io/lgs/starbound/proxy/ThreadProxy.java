@@ -1,5 +1,7 @@
 package io.lgs.starbound.proxy;
 
+import io.lgs.starbound.Wrapper;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,7 +16,6 @@ public class ThreadProxy extends Thread {
 	public void run() {
 		 try {
 			serverSocket = new ServerSocket(21024);
-			Socket socketServer = new Socket("127.0.0.1", 21024);
 			
 			while (serverSocket.isBound() && !serverSocket.isClosed()) {
 				
@@ -22,9 +23,7 @@ public class ThreadProxy extends Thread {
 				
 				System.out.println("proxy: Connection recieved from " + clientSocket.getInetAddress().getHostAddress());
 				
-				// TODO: playerList.attemptConnect(clientSocket);
-				ThreadClient client = new ThreadClient(clientSocket, socketServer);
-				client.start();
+				Wrapper.getServer().playerList.attemptSocketConnect(clientSocket);
 			}
 			
 		} catch (IOException e) {

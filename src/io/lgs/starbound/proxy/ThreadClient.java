@@ -1,5 +1,8 @@
 package io.lgs.starbound.proxy;
 
+import io.lgs.starbound.entity.Player;
+import io.lgs.starbound.proxy.packets.Packet;
+
 import java.io.IOException;
 import java.net.Socket;
 
@@ -9,6 +12,8 @@ public class ThreadClient extends Thread {
 	private final Socket serverSocket;
 	private ServerStreams serverStreams;
 	private ClientStreams clientStreams;
+	
+	private Player player;
 	
 	public ThreadClient(Socket clientSocket, Socket serverSocket) {
 		this.clientSocket = clientSocket;
@@ -44,6 +49,14 @@ public class ThreadClient extends Thread {
 		
 	}
 	
+	public void setPlayer(Player player) {
+		this.player = player;
+	}
+	
+	public Player getPlayer() {
+		return player;
+	}
+	
 	// TODO: Create packet handler
 	
 	public Socket getClientSocket() {
@@ -60,6 +73,23 @@ public class ThreadClient extends Thread {
 	
 	public ClientStreams getClientStreams() {
 		return clientStreams;
+	}
+	
+	public void sendPacketToClient(Packet packet) {
+		try {
+			packet.writePacket(clientStreams.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void sendPacketToServer(Packet packet) {
+		try {
+			packet.writePacket(clientStreams.getOutputStream());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public synchronized void disconnect() {

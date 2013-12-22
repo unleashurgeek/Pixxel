@@ -97,6 +97,15 @@ public abstract class Packet {
 		return packet;
 	}
 	
+	public void writePacket(DataOutput dataOutput) throws IOException {
+		Packet packet = this;
+		dataOutput.write(packet.getPacketId());
+		
+		// TODO: Change to Adaptive Variant packetSize
+		dataOutput.write(Util.encodeVLQ(packet.getPacketSize()));
+		packet.writePacketData(dataOutput);
+	}
+	
 	/**
 	 * Writes a packet, prefixed by its ID, to the data stream.
 	 */
@@ -111,12 +120,12 @@ public abstract class Packet {
 	/**
 	 * Abstract. Reads the raw packet data from the data stream.
 	 */
-	public abstract void readPacketData(DataInput dataInput) throws IOException;
+	protected abstract void readPacketData(DataInput dataInput) throws IOException;
 	
 	/**
 	 * Abstract. Writes the raw packet data to the data stream.
 	 */
-	public abstract void writePacketData(DataOutput dataOutput) throws IOException;
+	protected abstract void writePacketData(DataOutput dataOutput) throws IOException;
 	
 	/**
 	 * Abstract. Passes this packet on to the PacketHandler for processing.

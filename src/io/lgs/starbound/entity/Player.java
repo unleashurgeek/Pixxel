@@ -43,6 +43,8 @@ public class Player {
 	}
 	
 	public void kickPlayer() {
+		
+		// TODO: replace with sending disconnect packet.
 		client.disconnect();
 		Wrapper.getServer().playerList.disconnect();
 		// Remove from Player lists?
@@ -50,7 +52,7 @@ public class Player {
 	}
 	
 	public void sendMessage(String message) {
-		client.sendPacket(new Packet5ChatReceive());
+		client.sendPacketToClient(new Packet5ChatReceive(this.getName(), message));
 		// Write sends. Main use of this will be for plugins using  
 	}
 }
