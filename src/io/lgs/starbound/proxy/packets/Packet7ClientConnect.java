@@ -7,7 +7,9 @@ import io.lgs.starbound.util.Util;
 import java.io.IOException;
 
 public class Packet7ClientConnect extends Packet {
-
+	
+	public byte[] data;
+	
 	public int unk1_length;
 	public byte[] unk1; // i really dont know what this bytearray is for
 	public int claim_length;
@@ -18,14 +20,13 @@ public class Packet7ClientConnect extends Packet {
 	public byte[] playerdata; // Ship, Player (unknwon length, could be
 								// calculated, ignore it at the moment)
 
-	public Packet7ClientConnect() {
-
-	}
+	public Packet7ClientConnect() {}
 
 	@Override
 	public void readPacketData(ByteArrayDataInput dataInput) throws IOException {
+		data = dataInput.getData();
+		
 		unk1_length = dataInput.readVLQ();
-
 		unk1 = new byte[unk1_length];
 		dataInput.readFully(unk1);
 
@@ -45,20 +46,17 @@ public class Packet7ClientConnect extends Packet {
 
 	@Override
 	public void writePacketData(ByteArrayDataOutputStream dataOutput) throws IOException {
-		// TODO Auto-generated method stub
-
+		dataOutput.write(data);
 	}
 
 	@Override
 	public void processPacket(PacketHandler packetHandler) {
-		// TODO Auto-generated method stub
-
+		// This packet never should be processed, only read.
 	}
 
 	@Override
 	public int getPacketSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		return data.length;
 	}
 
 }

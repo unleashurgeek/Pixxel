@@ -20,10 +20,10 @@ public class ThreadProxy extends Thread {
 			while (serverSocket.isBound() && !serverSocket.isClosed()) {
 				
 				Socket clientSocket = serverSocket.accept();
-				
-				System.out.println("proxy: Connection recieved from " + clientSocket.getInetAddress().getHostAddress());
-				
-				Wrapper.getServer().playerList.attemptSocketConnect(clientSocket);
+				if (!clientSocket.getInetAddress().getHostAddress().equals("127.0.0.1")) {
+					System.out.println("proxy: Connection recieved from " + clientSocket.getInetAddress().getHostAddress());
+					Wrapper.getServer().playerList.attemptLogin(clientSocket);
+				}
 			}
 			
 		} catch (IOException e) {

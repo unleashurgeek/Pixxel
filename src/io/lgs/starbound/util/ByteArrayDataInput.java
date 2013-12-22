@@ -19,6 +19,10 @@ public class ByteArrayDataInput implements DataInput {
 		data = src;
 		buffer = ByteBuffer.wrap(data);
 	}
+	
+	public byte[] getData() {
+		return data;
+	}
 
 	public int readVLQ() throws IOException {
 		int n = 0;

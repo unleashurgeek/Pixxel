@@ -1,6 +1,5 @@
 package io.lgs.starbound.entity;
 
-import io.lgs.starbound.Wrapper;
 import io.lgs.starbound.proxy.ThreadClient;
 import io.lgs.starbound.proxy.packets.Packet11ChatSend;
 import io.lgs.starbound.util.ChatColor;
@@ -10,11 +9,14 @@ import java.net.InetAddress;
 public class Player {
 	private final String username;
 	private final ThreadClient client;
-	private String UUID;
+	private final String UUID;
+	private final String race;
 	private boolean op = false;
 	
-	public Player(String username, ThreadClient client) {
+	public Player(String username, String UUID, String race, ThreadClient client) {
 		this.username = username;
+		this.UUID = UUID;
+		this.race = race;
 		this.client = client;
 	}
 	
@@ -26,9 +28,8 @@ public class Player {
 		return UUID;
 	}
 	
-	// TODO: store UUID's in ClientThread or PlayerList
-	public void setUUID(String UUID) {
-		this.UUID = UUID;
+	public String getRace() {
+		return race;
 	}
 	
 	public InetAddress getAddress() {
@@ -46,9 +47,6 @@ public class Player {
 	public void kickPlayer() {
 		// TODO: replace with sending disconnect packet.
 		client.disconnect();
-		Wrapper.getServer().playerList.disconnect();
-		// Remove from Player lists?
-		// send disconnect method in PlayerList?
 	}
 	
 	public void sendMessage(String message, ChatColor color) {

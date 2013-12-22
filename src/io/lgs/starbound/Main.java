@@ -18,10 +18,6 @@ public class Main {
 		ProcessBuilder pb = new ProcessBuilder(serverProperties.serverLocation());
 		pb.redirectErrorStream(true);
 		
-		StarboundServer ss = new StarboundServer(pb);
-		
-		PlayerList playerList = new PlayerList(ss);
-		
-		new AegisServer(ss, playerList, serverProperties);
+		new StarboundServer(pb, serverProperties);
 	}
 }

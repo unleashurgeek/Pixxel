@@ -43,7 +43,6 @@ public class ServerProperties {
 	
 	public void load() throws IOException, FileNotFoundException {
 		if (!propertiesFile.exists()) {
-			propertiesFile.mkdirs();
 			propertiesFile.createNewFile();
 			
 			// ---- Default Config Settings ----

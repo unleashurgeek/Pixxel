@@ -31,3 +31,5 @@ local.properties
 *.jar
 *.war
 *.ear
+/Bans.txt
+/server.properties

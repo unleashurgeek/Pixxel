@@ -1,5 +1,6 @@
 package io.lgs.starbound.proxy;
 
+import io.lgs.starbound.Wrapper;
 import io.lgs.starbound.entity.Player;
 import io.lgs.starbound.proxy.packets.Packet;
 import io.lgs.starbound.proxy.packets.PacketHandler;
@@ -96,6 +97,7 @@ public class ThreadClient extends Thread {
 	}
 	
 	public synchronized void disconnect() {
+		Wrapper.getServer().playerList.disconnect(this);
 		try {
 			this.serverSocket.close();
 			this.clientSocket.close();

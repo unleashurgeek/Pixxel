@@ -1,5 +1,6 @@
 package io.lgs.starbound;
 
+import io.lgs.starbound.file.ServerProperties;
 import io.lgs.starbound.proxy.ThreadProxy;
 
 import java.io.BufferedReader;
@@ -12,17 +13,19 @@ public class StarboundServer {
 	private String version;
 	private ThreadProxy proxy;
 	
-	public StarboundServer(ProcessBuilder starboundBuilder) {
+	public StarboundServer(ProcessBuilder starboundBuilder, ServerProperties properties) {
 		BufferedReader starboundConsole;
 		
 		try {
 			starbound = starboundBuilder.start();
 			starboundConsole = new BufferedReader(new InputStreamReader(starbound.getInputStream()));
-
 			
 			// Start Proxy
 			proxy = new ThreadProxy();
 			proxy.start();
+			
+			PlayerList playerList = new PlayerList(this, properties);
+			new AegisServer(this, playerList, properties);
 			
 			// Started Console Monitor Thread
 			ThreadConsole console = new ThreadConsole(starboundConsole);

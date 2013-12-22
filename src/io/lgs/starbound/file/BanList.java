@@ -33,6 +33,13 @@ public class BanList extends File {
 	}
 	
 	public void load() {
+		if (!this.exists())
+			try {
+				this.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		
 		try(BufferedReader br = new BufferedReader(new FileReader(this))) {
 			for (String line; (line = br.readLine()) != null;) {
 				if (!(line.matches("") || line.isEmpty() || line == null) && line.matches(IPADDRESS_PATTERN)){
