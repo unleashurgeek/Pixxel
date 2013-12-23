@@ -1,6 +1,7 @@
 package io.lgs.starbound.proxy;
 
 import io.lgs.starbound.proxy.packets.Packet;
+import io.lgs.starbound.proxy.packets.RawPacket;
 import io.lgs.starbound.util.ByteArrayDataInput;
 
 import java.io.DataInputStream;
@@ -24,15 +25,30 @@ public class ThreadForward extends Thread {
 	@Override
 	public void run() {
 		byte[] buffer = new byte[BUFFER_SIZE];
-		Packet packet;
+		RawPacket pkt = new RawPacket();
+		boolean firstRun = true;
 		try {
-			for (int bufferSize; (bufferSize = input.read(buffer)) != -1;) {
-				packet = Packet.readPacket(new ByteArrayDataInput(buffer), isToServer);
-				if (packet != null) {
-					packet.processPacket(client.getPacketHandler());
-				} else {
-					this.output.write(buffer, 0, bufferSize);
-					this.output.flush();
+			for (int size; (size = input.read(buffer)) != -1;) {
+				int round_length = 0;
+				ByteArrayDataInput barr = new ByteArrayDataInput(buffer);
+				
+				while (round_length < size) {
+					if (firstRun || pkt.eop) {
+						firstRun = false;
+						pkt = Packet.fetchRawPacket(barr);
+					} else {
+						pkt = Packet.fetchRawPacket(barr, pkt);
+					}
+
+					if (!pkt.eop || pkt.zlib)
+						break;
+
+					round_length = barr.getPosition();
+					
+					Packet packet = Packet.readPacket(pkt, isToServer);
+					if (packet != null) {
+						packet.processPacket(client.getPacketHandler());
+					}
 				}
 			}
 				

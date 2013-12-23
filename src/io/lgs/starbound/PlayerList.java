@@ -7,6 +7,7 @@ import io.lgs.starbound.proxy.ClientStreams;
 import io.lgs.starbound.proxy.ThreadClient;
 import io.lgs.starbound.proxy.packets.Packet;
 import io.lgs.starbound.proxy.packets.Packet7ClientConnect;
+import io.lgs.starbound.proxy.packets.RawPacket;
 import io.lgs.starbound.util.ByteArrayDataInput;
 
 import java.io.IOException;
@@ -64,11 +65,30 @@ public class PlayerList {
 			@Override
 			public void run() {
 				byte[] buffer = new byte[1460];
+				RawPacket pkt = new RawPacket();
+				boolean firstRun = true;
 				try {
 					for (int size; (size = clientSocket.getInputStream().read(buffer)) != -1;) {
-						if (buffer[0] == (byte)0x07) {
+						int round_length = 0;
+						ByteArrayDataInput barr = new ByteArrayDataInput(buffer);
+						
+						while (round_length < size) {
+							if (firstRun || pkt.eop) {
+								firstRun = false;
+								pkt = Packet.fetchRawPacket(barr);
+							} else {
+								pkt = Packet.fetchRawPacket(barr, pkt);
+							}
+
+							if (!pkt.eop || pkt.zlib)
+								break;
+
+							round_length = barr.getPosition();
+						}
+						
+						if (pkt.type == 7 && pkt.eop) {
 							System.out.println("Perhaps here?");
-							Packet7ClientConnect packet = (Packet7ClientConnect) Packet.readPacket(new ByteArrayDataInput(buffer), true);
+							Packet7ClientConnect packet = (Packet7ClientConnect) Packet.readPacket(pkt, true);
 							final ThreadClient client = new ThreadClient(clientSocket, server);
 							Player player = new Player(packet.username, packet.uuid, packet.race, client);
 							client.setPlayer(player);
@@ -84,9 +104,8 @@ public class PlayerList {
 								break;
 						} else {
 							server.getOutputStream().write(buffer, 0, size);
-							server.getOutputStream().flush();
+                            server.getOutputStream().flush();
 						}
-						
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

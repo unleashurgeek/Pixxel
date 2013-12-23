@@ -72,13 +72,51 @@ public abstract class Packet {
 	public final int getPacketId() {
 		return ((Integer)packetClassToIdMap.get(this.getClass())).intValue();
 	}
+	
+	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput)
+			throws IOException {
+		return fetchRawPacket(dataInput, null);
+	}
+
+	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput,
+			RawPacket pkt) throws IOException {
+		if (pkt == null) {
+			pkt = new RawPacket();
+			pkt.type = dataInput.readVLQ();
+			pkt.data_length = dataInput.readSVLQ();
+
+			if (pkt.data_length < 0) {
+				pkt.data_length = (-pkt.data_length);
+				pkt.zlib = true;
+			}
+
+			pkt.data = new byte[pkt.data_length];
+			pkt.data_pos = dataInput.readBytes(pkt.data);
+
+			if (pkt.data_pos == pkt.data_length) {
+				pkt.eop = true;
+				return pkt;
+			}
+		} else if (!pkt.eop) {
+			pkt.data_pos = dataInput.readBytes(pkt.data, pkt.data_pos,
+					pkt.data_length - pkt.data_pos);
+
+			if (pkt.data_pos == pkt.data_length) {
+				pkt.eop = true;
+				return pkt;
+			} else {
+				pkt.eop = false;
+			}
+		}
+
+		return pkt;
+	}
 
 	/**
 	 * Parse a packet, prefixed by its ID, from the raw packet data.
 	 */
-	public static Packet readPacket(DataInput dataInput, boolean isServer) throws IOException {
+	public static Packet readPacket(RawPacket rawPacket, boolean isServer) throws IOException {
 		Packet packet = null;
-		RawPacket rawPacket = new RawPacket((ByteArrayDataInput) dataInput);
 		int packetID = rawPacket.type;
 		
 		if (isServer && !serverPacketIdList.contains(packetID) || !isServer
@@ -94,7 +132,7 @@ public abstract class Packet {
 			rawPacket.data = Compressor.decompress(rawPacket.data);
 		}
 		
-		packet.readPacketData((ByteArrayDataInput) dataInput);
+		packet.readPacketData(new ByteArrayDataInput(rawPacket.data));
 		
 		return packet;
 	}
