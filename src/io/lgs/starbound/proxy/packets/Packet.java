@@ -90,11 +90,14 @@ public abstract class Packet {
 		if (packet == null)
 			return null;
 		
+		// TODO: Dont ever edit the raw packet again... that was the whole problem...
+		byte[] buf = rawPacket.data;
+		
 		if (rawPacket.zlib) {
-			rawPacket.data = Compressor.decompress(rawPacket.data);
+			buf = Compressor.decompress(buf);
 		}
 		
-		byteArrayDataInput = new ByteArrayDataInput(rawPacket.data);
+		byteArrayDataInput = new ByteArrayDataInput(buf);
 		packet.readPacketData(byteArrayDataInput);
 		
 		return packet;

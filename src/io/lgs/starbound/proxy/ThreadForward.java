@@ -44,7 +44,6 @@ public class ThreadForward extends Thread {
 			int size;
 			
 			while ((size = input.read(buffer)) != -1) {
-				System.out.println("Debug0" + isToServer);
 				if (!isRunning)
 					break;
 				
@@ -53,8 +52,6 @@ public class ThreadForward extends Thread {
 				while (buffer_pos < size) {
 					byte[] tmp_buffer = Arrays.copyOfRange(buffer, buffer_pos, size);
 					ByteArrayDataInput barr = new ByteArrayDataInput(tmp_buffer);
-					
-					System.out.println("Debug2" + isToServer);
 					
 					if (pkt == null || pkt.eop) {
 						pkt = new RawPacket();
@@ -65,8 +62,6 @@ public class ThreadForward extends Thread {
 					buffer_pos = barr.getPosition();
 					
 					barr = null;
-					
-					System.out.println(pkt.type + ":" + pkt.eop);
 					
 					if (!pkt.eop)
 						break;
@@ -85,12 +80,8 @@ public class ThreadForward extends Thread {
 						client.setPlayer(player);
 						pkt.writeRawPacket(this.output);
 						
-						System.out.println("Debug3" + isToServer);
-						
 						continue;
 					}
-					
-					System.out.println("Debug4" + isToServer);
 					
 					Packet packet = Packet.readPacket(pkt, isToServer);
 					
@@ -100,19 +91,13 @@ public class ThreadForward extends Thread {
 						pkt.writeRawPacket(this.output);
 					}
 				}
-				
-				System.out.println("Debug5" + isToServer);
 			}
-		} catch (EOFException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out
 					.println("Something went wrong and broke the forward thread(s) of "
 							+ client.getClientSocket().getInetAddress());
 			this.client.disconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 }
