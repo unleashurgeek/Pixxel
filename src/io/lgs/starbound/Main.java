@@ -14,10 +14,6 @@ public class Main {
 		ServerProperties serverProperties = new ServerProperties(propertiesFile);
 		serverProperties.load();
 		
-		
-		ProcessBuilder pb = new ProcessBuilder(serverProperties.serverLocation());
-		pb.redirectErrorStream(true);
-		
-		new StarboundServer(pb, serverProperties);
+		new StarboundServer(serverProperties);
 	}
 }

@@ -13,12 +13,16 @@ public class StarboundServer {
 	private String version;
 	private ThreadProxy proxy;
 	
-	public StarboundServer(ProcessBuilder starboundBuilder, ServerProperties properties) {
-		BufferedReader starboundConsole;
+	public StarboundServer(ServerProperties properties) {
+		BufferedReader starboundConsole = null;
 		
 		try {
-			starbound = starboundBuilder.start();
-			starboundConsole = new BufferedReader(new InputStreamReader(starbound.getInputStream()));
+			if (!properties.detachedMode()) {
+				ProcessBuilder pb = new ProcessBuilder(properties.serverLocation());
+				pb.redirectErrorStream(true);
+				starbound = pb.start();
+				starboundConsole = new BufferedReader(new InputStreamReader(starbound.getInputStream()));
+			}
 			
 			// Start Proxy
 			proxy = new ThreadProxy();
@@ -27,11 +31,12 @@ public class StarboundServer {
 			PlayerList playerList = new PlayerList(this, properties);
 			new AegisServer(this, playerList, properties);
 			
-			// Started Console Monitor Thread
-			ThreadConsole console = new ThreadConsole(starboundConsole);
-			console.start();
-			version = console.getVersion();
-			
+			if (!properties.detachedMode()) {
+				// Started Console Monitor Thread
+				ThreadConsole console = new ThreadConsole(starboundConsole);
+				console.start();
+				version = console.getVersion();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

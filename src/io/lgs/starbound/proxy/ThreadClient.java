@@ -8,6 +8,8 @@ import io.lgs.starbound.proxy.packets.PacketHandler;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class ThreadClient extends Thread {
 	
@@ -20,11 +22,19 @@ public class ThreadClient extends Thread {
 	private ThreadForward forwardServer;
 	private ThreadForward forwardClient;
 	
+	
+	// TODO: Add a queue system
+	private Queue<Packet> sendToClientQueue = new LinkedList<Packet>();
+	private Queue<Packet> sendToServerQueue = new LinkedList<Packet>();
+	
+	private Queue<Packet> receiveFromClientQueue = new LinkedList<Packet>();
+	private Queue<Packet> receiveFromServerQueue = new LinkedList<Packet>();
+	
 	private Player player;
 	
 	public ThreadClient(Socket clientSocket) throws UnknownHostException, IOException {
 		this.clientSocket = clientSocket;
-		this.serverSocket = new Socket("127.0.0.1", 21024);
+		this.serverSocket = new Socket("127.0.0.1", 21022);
 		this.packetHandler = new PacketHandler(this);
 	}
 	

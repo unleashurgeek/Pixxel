@@ -21,9 +21,8 @@ public class ThreadProxy extends Thread {
 				
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("proxy: Connection recieved from " + clientSocket.getInetAddress().getHostAddress());
-				Wrapper.getServer().playerList.attemptLogin(clientSocket);
+				Wrapper.getServer().playerList.connect(clientSocket);
 				try {
-					System.out.println("here");
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block

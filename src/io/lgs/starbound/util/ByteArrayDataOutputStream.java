@@ -60,7 +60,7 @@ public class ByteArrayDataOutputStream extends FilterOutputStream implements Dat
 	}
 	
 	public void writeSVLQ(int n) throws IOException {
-		out.write(Util.encodeZigZag32(n));
+		writeVLQ(Util.encodeZigZag32(n));
 	}
 	
 	public void writeBytes(byte[] b) throws IOException {

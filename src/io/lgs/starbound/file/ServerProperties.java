@@ -36,6 +36,9 @@ public class ServerProperties {
 	/** File Bans.txt */
 	private BanList banFile;
 	
+	/** Use external Server **/
+	private Boolean detachedMode;
+	
 	public ServerProperties(File file) {
 		this.serverProperties = new Properties();
 		this.propertiesFile = file;
@@ -53,6 +56,7 @@ public class ServerProperties {
 			serverProperties.setProperty("showError", "true");
 			serverProperties.setProperty("adminFile", "Admins.txt");
 			serverProperties.setProperty("banFile", "Bans.txt");
+			serverProperties.setProperty("detachedMode", "false");
 			
 			serverProperties.store(new FileOutputStream(propertiesFile), null);
 		}
@@ -66,6 +70,7 @@ public class ServerProperties {
 		this.showError        = Boolean.valueOf(serverProperties.getProperty("showError", "true"));
 		this.adminFile        = new File(serverProperties.getProperty("adminFile", "Admins.txt"));
 		this.banFile          = new BanList(serverProperties.getProperty("banFile", "Bans.txt"));
+		this.detachedMode     = Boolean.valueOf(serverProperties.getProperty("detachedMode", "false"));
 	}
 	
 	public String serverLocation() {
@@ -94,5 +99,9 @@ public class ServerProperties {
 	
 	public boolean showError() {
 		return showError;
+	}
+	
+	public boolean detachedMode() {
+		return detachedMode;
 	}
 }

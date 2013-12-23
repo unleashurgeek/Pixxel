@@ -72,45 +72,6 @@ public abstract class Packet {
 	public final int getPacketId() {
 		return ((Integer)packetClassToIdMap.get(this.getClass())).intValue();
 	}
-	
-	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput)
-			throws IOException {
-		return fetchRawPacket(dataInput, null);
-	}
-
-	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput,
-			RawPacket pkt) throws IOException {
-		if (pkt == null) {
-			pkt = new RawPacket();
-			pkt.type = dataInput.readVLQ();
-			pkt.data_length = dataInput.readSVLQ();
-
-			if (pkt.data_length < 0) {
-				pkt.data_length = (-pkt.data_length);
-				pkt.zlib = true;
-			}
-			System.out.println(pkt.data_length);
-			pkt.data = new byte[pkt.data_length];
-			pkt.data_pos = dataInput.readBytes(pkt.data);
-
-			if (pkt.data_pos == pkt.data_length) {
-				pkt.eop = true;
-				return pkt;
-			}
-		} else if (!pkt.eop) {
-			pkt.data_pos = dataInput.readBytes(pkt.data, pkt.data_pos,
-					pkt.data_length - pkt.data_pos);
-
-			if (pkt.data_pos == pkt.data_length) {
-				pkt.eop = true;
-				return pkt;
-			} else {
-				pkt.eop = false;
-			}
-		}
-
-		return pkt;
-	}
 
 	/**
 	 * Parse a packet, prefixed by its ID, from the raw packet data.
