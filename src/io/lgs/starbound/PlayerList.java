@@ -33,12 +33,13 @@ public class PlayerList {
 	
 	
 	public void attemptLogin(final Socket clientSocket) throws UnknownHostException, IOException {
-		if (banList.getBans() != null && banList.getBans().contains(clientSocket.getInetAddress().getHostAddress())) {
-			System.out.println("Here!");
+		if (banList.getBans() != null && !banList.getBans().isEmpty() && banList.getBans().contains(clientSocket.getInetAddress().getHostAddress())) {
 			return;
 		}
-		final Socket server = new Socket("127.0.0.1", 21024);
 		
+		
+		
+		final Socket server = new Socket("127.0.0.1", 21024);		
 		
 		// To Client
 		new Thread(new Runnable() {
@@ -50,8 +51,9 @@ public class PlayerList {
 						clientSocket.getOutputStream().write(buffer, 0, size);
 						clientSocket.getOutputStream().flush();
 						
-						if (breakThreads)
+						if (breakThreads) {
 							break;
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -89,7 +91,7 @@ public class PlayerList {
 						if (pkt.type == 7 && pkt.eop) {
 							System.out.println("Perhaps here?");
 							Packet7ClientConnect packet = (Packet7ClientConnect) Packet.readPacket(pkt, true);
-							final ThreadClient client = new ThreadClient(clientSocket, server);
+							ThreadClient client = new ThreadClient(clientSocket, server);
 							Player player = new Player(packet.username, packet.uuid, packet.race, client);
 							client.setPlayer(player);
 							
@@ -105,6 +107,10 @@ public class PlayerList {
 						} else {
 							server.getOutputStream().write(buffer, 0, size);
                             server.getOutputStream().flush();
+							/*if (buffer[0] == (byte)0x09) {
+								client.start();
+								break;
+							}*/
 						}
 					}
 				} catch (Exception e) {

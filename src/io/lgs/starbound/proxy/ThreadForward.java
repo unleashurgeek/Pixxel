@@ -7,6 +7,7 @@ import io.lgs.starbound.util.ByteArrayDataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ThreadForward extends Thread {
 	private static final int BUFFER_SIZE = 1460;
@@ -14,21 +15,32 @@ public class ThreadForward extends Thread {
 	private final DataOutputStream output;
 	private final ThreadClient client;
 	private final boolean isToServer;
-
+	
+	private boolean isRunning = true;
+	
 	public ThreadForward(ThreadClient client, DataInputStream input, DataOutputStream output, boolean isToServer) {
 		this.client = client;
 		this.output = output;
 		this.input = input;
 		this.isToServer = isToServer;
 	}
+	
+	public void setRunning(boolean value) {
+		isRunning = value;
+	}
 
 	@Override
 	public void run() {
 		byte[] buffer = new byte[BUFFER_SIZE];
 		RawPacket pkt = new RawPacket();
+		Packet packet = null;
 		boolean firstRun = true;
 		try {
-			for (int size; (size = input.read(buffer)) != -1;) {
+			int size;
+			while ((size = input.read(buffer)) != -1) {
+				if (!isRunning)
+					break;
+				
 				int round_length = 0;
 				ByteArrayDataInput barr = new ByteArrayDataInput(buffer);
 				
@@ -40,15 +52,18 @@ public class ThreadForward extends Thread {
 						pkt = Packet.fetchRawPacket(barr, pkt);
 					}
 
+					round_length = barr.getPosition();
 					if (!pkt.eop || pkt.zlib)
 						break;
-
-					round_length = barr.getPosition();
 					
-					Packet packet = Packet.readPacket(pkt, isToServer);
-					if (packet != null) {
-						packet.processPacket(client.getPacketHandler());
-					}
+					packet = Packet.readPacket(pkt, isToServer);
+				}
+				if (packet != null) {
+					System.out.println(Arrays.toString(buffer));
+					packet.processPacket(client.getPacketHandler());
+				} else {
+					output.write(buffer, 0, size);
+					output.flush();
 				}
 			}
 				
@@ -71,7 +86,7 @@ public class ThreadForward extends Thread {
 			System.out
 					.println("Something went wrong and broke the forward thread(s) of "
 							+ client.getClientSocket().getInetAddress());
+			this.client.disconnect();
 		}
-		this.client.disconnect();
 	}
 }

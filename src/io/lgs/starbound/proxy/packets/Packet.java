@@ -89,7 +89,7 @@ public abstract class Packet {
 				pkt.data_length = (-pkt.data_length);
 				pkt.zlib = true;
 			}
-
+			System.out.println(pkt.data_length);
 			pkt.data = new byte[pkt.data_length];
 			pkt.data_pos = dataInput.readBytes(pkt.data);
 
@@ -118,6 +118,7 @@ public abstract class Packet {
 	public static Packet readPacket(RawPacket rawPacket, boolean isServer) throws IOException {
 		Packet packet = null;
 		int packetID = rawPacket.type;
+		ByteArrayDataInput byteArrayDataInput;
 		
 		if (isServer && !serverPacketIdList.contains(packetID) || !isServer
 				&& !clientPacketIdList.contains(packetID)) {
@@ -132,7 +133,8 @@ public abstract class Packet {
 			rawPacket.data = Compressor.decompress(rawPacket.data);
 		}
 		
-		packet.readPacketData(new ByteArrayDataInput(rawPacket.data));
+		byteArrayDataInput = new ByteArrayDataInput(rawPacket.data);
+		packet.readPacketData(byteArrayDataInput);
 		
 		return packet;
 	}
@@ -198,7 +200,7 @@ public abstract class Packet {
 		//addIdClassMapping(1, true, false, Packet1ProtocolVersion.class);
 		//addIdClassMapping(2, true, false, Packet2ConnectResponse.class);
 		//addIdClassMapping(5, true, false, Packet5ChatReceive.class);
-		//addIdClassMapping(7, false, true, Packet7ClientConnect.class);
+		addIdClassMapping(7, false, true, Packet7ClientConnect.class);
 		//addIdClassMapping(11, false, true, Packet11ChatSend.class);
 	}
 }

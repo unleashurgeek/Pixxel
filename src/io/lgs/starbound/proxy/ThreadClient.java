@@ -7,18 +7,28 @@ import io.lgs.starbound.proxy.packets.PacketHandler;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class ThreadClient extends Thread {
 	
 	private final Socket clientSocket;
 	private final Socket serverSocket;
-	private ServerStreams serverStreams;
-	private ClientStreams clientStreams;
+	private ServerStreams serverStreams = new ServerStreams();
+	private ClientStreams clientStreams = new ClientStreams();
 	private PacketHandler packetHandler;
+	
+	private ThreadForward forwardServer;
+	private ThreadForward forwardClient;
 	
 	private Player player;
 	
-	public ThreadClient(Socket clientSocket, Socket serverSocket) {
+	public ThreadClient(Socket clientSocket) throws UnknownHostException, IOException {
+		this.clientSocket = clientSocket;
+		this.serverSocket = new Socket("127.0.0.1", 21024);
+		this.packetHandler = new PacketHandler(this);
+	}
+	
+	public ThreadClient(Socket clientSocket, Socket serverSocket) throws UnknownHostException, IOException {
 		this.clientSocket = clientSocket;
 		this.serverSocket = serverSocket;
 		this.packetHandler = new PacketHandler(this);
@@ -35,10 +45,10 @@ public class ThreadClient extends Thread {
 			clientStreams.setOutputStream(clientSocket.getOutputStream());
 			
 			// Packets Client to Server
-			ThreadForward forwardServer = new ThreadForward(this, clientStreams.getInputStream(), serverStreams.getOutputStream(), true);
+			forwardServer = new ThreadForward(this, clientStreams.getInputStream(), serverStreams.getOutputStream(), true);
 			
 			// Packets Server to Client
-			ThreadForward forwardClient =  new ThreadForward(this, serverStreams.getInputStream(), clientStreams.getOutputStream(), false);
+			forwardClient =  new ThreadForward(this, serverStreams.getInputStream(), clientStreams.getOutputStream(), false);
 			
 			// Start Forwards
 			forwardServer.start();
@@ -96,13 +106,9 @@ public class ThreadClient extends Thread {
 		}
 	}
 	
-	public synchronized void disconnect() {
+	public void disconnect() {
 		Wrapper.getServer().playerList.disconnect(this);
-		try {
-			this.serverSocket.close();
-			this.clientSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		forwardServer.setRunning(false);
+		forwardServer.setRunning(false);
 	}
 }

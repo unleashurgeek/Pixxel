@@ -1,5 +1,7 @@
 package io.lgs.starbound;
 
+import io.lgs.starbound.entity.Player;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -23,6 +25,19 @@ public class ThreadConsole extends Thread {
 					showLine = false;
 				else if (line.startsWith("Error: ") && !Wrapper.getServer().getConfig().showError())
 					showLine = false;
+				
+				// TODO: Replace with PacketHandler
+				if (line.endsWith("disconnected")) {
+					String[] parts = line.split("'");
+					StringBuilder username = new StringBuilder();
+					for (int i = 1; i < parts.length -1; i++) {
+						username.append(parts[i]);
+					}
+					
+					Player player = Wrapper.getServer().getPlayer(username.toString());
+					player.kickPlayer();
+					System.out.println("player kicked?");
+				}
 				
 				if (showLine)
 					System.out.println(line);

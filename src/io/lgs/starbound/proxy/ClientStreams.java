@@ -9,7 +9,7 @@ public class ClientStreams {
 	private DataInputStream  inputStream;
 	private DataOutputStream outputStream;
 	
-	private ClientStreams() {};
+	public ClientStreams() {};
 	
 	public void setInputStream(InputStream inputStream) {
 		this.inputStream = new DataInputStream(inputStream);
