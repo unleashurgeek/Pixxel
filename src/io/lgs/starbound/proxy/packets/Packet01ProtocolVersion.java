@@ -5,12 +5,12 @@ import io.lgs.starbound.util.ByteArrayDataOutputStream;
 
 import java.io.IOException;
 
-public class Packet1ProtocolVersion extends Packet {
+public class Packet01ProtocolVersion extends Packet {
 
 	/** Version of the server. */
 	public int version;
 
-	public Packet1ProtocolVersion() {
+	public Packet01ProtocolVersion() {
 		// TODO: Read input
 	}
 

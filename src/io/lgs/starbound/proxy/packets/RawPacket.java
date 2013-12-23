@@ -13,8 +13,6 @@ import io.lgs.starbound.util.Util;
 
 public class RawPacket {
 	
-	private ByteArrayDataInput dataInput;
-	
 	public int type;
 
 	public int data_length;
@@ -24,8 +22,6 @@ public class RawPacket {
 	public int packet_length = 0;
 	public boolean zlib;
 	public boolean eop = true;
-	public boolean isInitialized = false;
-	public byte[] buffer;
 	
 	public RawPacket() {
 	}
@@ -60,29 +56,7 @@ public class RawPacket {
 		}
 	}
 	
-	public void writeRawPacket(DataOutput dataOutput) throws IOException {
-		writeRawPacket((ByteArrayDataOutputStream) dataOutput);
-	}
-	
 	public void writeRawPacket(ByteArrayDataOutputStream dataOutput) throws IOException {
-		// ok i could also save a raw copy of the buffer, but i want it this way
-		ByteBuffer buf = ByteBuffer.allocate(1000000);
-		
-		buf.put(Util.encodeInt(this.type));
-		
-		int length = this.data_length;
-		
-		if (this.zlib) {
-			length = -(length + 1);
-		}
-		
-		int test = 0;
-		test = buf.limit();
-		
-		buf.put(Util.encodeSInt(length));
-		buf.put(this.data);
-		
-		dataOutput.writeBytes(Arrays.copyOf( buf.array(), buf.position() ));
-		dataOutput.flush();
+
 	}
 }

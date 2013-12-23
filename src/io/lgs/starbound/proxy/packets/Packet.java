@@ -83,17 +83,23 @@ public abstract class Packet {
 		
 		if (isServer && !serverPacketIdList.contains(packetID) || !isServer
 				&& !clientPacketIdList.contains(packetID)) {
-			return null;
+			packet = new Packet00GenericPacket();
+			
+			((Packet00GenericPacket)packet).type = rawPacket.type;
+			((Packet00GenericPacket)packet).length = rawPacket.data_length;
+			((Packet00GenericPacket)packet).data = rawPacket.data;
+			
+			return packet;
 		}
 		
 		packet = getNewPacket(packetID);
 		if (packet == null)
 			return null;
 		
-		// TODO: Dont ever edit the raw packet again... that was the whole problem...
 		byte[] buf = rawPacket.data;
 		
-		if (rawPacket.zlib) {
+		if (rawPacket.data_length < 0) {
+			
 			buf = Compressor.decompress(buf);
 		}
 		
@@ -113,10 +119,20 @@ public abstract class Packet {
 	public static void writePacket(Packet packet, ByteArrayDataOutputStream dataOutput) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ByteArrayDataOutputStream bados = new ByteArrayDataOutputStream(baos);
-		packet.writePacket(bados);
+		packet.writePacketData(bados);
 		bados.flush();
 		byte[] data = baos.toByteArray();
 		bados.close();
+		
+		if (packet.getPacketId() == 0) {
+			Packet00GenericPacket pkt = (Packet00GenericPacket) packet;
+			dataOutput.writeVLQ(pkt.type);
+			dataOutput.writeSVLQ(-(pkt.length + 1));
+			dataOutput.writeBytes(data);
+			dataOutput.flush();
+			
+			return;
+		}
 		
 		if (packet.getPacketSize() > 255) {
 			data = Compressor.compress(data);
@@ -161,10 +177,11 @@ public abstract class Packet {
 	
 	static {
 		// TODO: Uncomment. Commented for testing purposes.
-		//addIdClassMapping(1, true, false, Packet1ProtocolVersion.class);
-		//addIdClassMapping(2, true, false, Packet2ConnectResponse.class);
-		//addIdClassMapping(5, true, false, Packet5ChatReceive.class);
-		addIdClassMapping(7, false, true, Packet7ClientConnect.class);
+		addIdClassMapping(0, true, false, Packet00GenericPacket.class);
+		//addIdClassMapping(1, true, false, Packet01ProtocolVersion.class);
+		//addIdClassMapping(2, true, false, Packet02ConnectResponse.class);
+		//addIdClassMapping(5, true, false, Packet05ChatReceive.class);
+		addIdClassMapping(7, false, true, Packet07ClientConnect.class);
 		//addIdClassMapping(11, false, true, Packet11ChatSend.class);
 	}
 }

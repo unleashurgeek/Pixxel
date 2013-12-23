@@ -14,6 +14,6 @@ public class PacketHandler {
 	}
 	
 	public void handleChatSend(Packet11ChatSend packet) {
-		
+		System.out.println("I'm here!");
 	}
 }

@@ -5,7 +5,7 @@ import io.lgs.starbound.util.ByteArrayDataOutputStream;
 
 import java.io.IOException;
 
-public class Packet2ConnectResponse extends Packet {
+public class Packet02ConnectResponse extends Packet {
 
 	/** Unknown */
 	public byte unk1;
@@ -13,7 +13,7 @@ public class Packet2ConnectResponse extends Packet {
 	/** Unknown */
 	public String unk2;
 
-	public Packet2ConnectResponse() {
+	public Packet02ConnectResponse() {
 		// TODO: Read input
 	}
 

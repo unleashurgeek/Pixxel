@@ -6,7 +6,7 @@ import io.lgs.starbound.file.ServerProperties;
 import io.lgs.starbound.proxy.ClientStreams;
 import io.lgs.starbound.proxy.ThreadClient;
 import io.lgs.starbound.proxy.packets.Packet;
-import io.lgs.starbound.proxy.packets.Packet7ClientConnect;
+import io.lgs.starbound.proxy.packets.Packet07ClientConnect;
 import io.lgs.starbound.proxy.packets.RawPacket;
 import io.lgs.starbound.util.ByteArrayDataInput;
 import io.lgs.starbound.util.Util;
@@ -32,7 +32,7 @@ public class PlayerList {
 	}
 	
 	public void connect(final Socket clientSocket) throws UnknownHostException, IOException {
-		final Socket server = new Socket("127.0.0.1", 21022);		
+		final Socket server = new Socket("127.0.0.1", 21024);		
 		ThreadClient client = new ThreadClient(clientSocket, server);
 		clients.add(client);
 		client.start();
@@ -104,7 +104,7 @@ public class PlayerList {
 							
 							if (pkt.type == 7) {
 								System.out.println("Found it!");
-								Packet7ClientConnect packet = (Packet7ClientConnect) Packet.readPacket(pkt, true);
+								Packet07ClientConnect packet = (Packet07ClientConnect) Packet.readPacket(pkt, true);
 								Player player = new Player(packet.username, packet.uuid, packet.race, client);
 								client.setPlayer(player);
 								

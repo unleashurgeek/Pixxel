@@ -6,7 +6,7 @@ import io.lgs.starbound.util.Util;
 
 import java.io.IOException;
 
-public class Packet7ClientConnect extends Packet {
+public class Packet07ClientConnect extends Packet {
 	
 	public byte[] data;
 	
@@ -20,7 +20,7 @@ public class Packet7ClientConnect extends Packet {
 	public byte[] playerdata; // Ship, Player (unknwon length, could be
 								// calculated, ignore it at the moment)
 
-	public Packet7ClientConnect() {}
+	public Packet07ClientConnect() {}
 
 	@Override
 	public void readPacketData(ByteArrayDataInput dataInput) throws IOException {

@@ -6,7 +6,7 @@ import io.lgs.starbound.util.ChatColor;
 
 import java.io.IOException;
 
-public class Packet5ChatReceive extends Packet {
+public class Packet05ChatReceive extends Packet {
 
 	/** Color of the Chat. */
 	public byte color;
@@ -26,7 +26,7 @@ public class Packet5ChatReceive extends Packet {
 	/** Message */
 	public String message;
 
-	public Packet5ChatReceive(ChatColor color, String sender, String message) {
+	public Packet05ChatReceive(ChatColor color, String sender, String message) {
 		this.color  = color.getByte();
 		this.sender =  sender;
 		this.message = message;

@@ -8,8 +8,8 @@ import io.lgs.starbound.proxy.packets.PacketHandler;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadClient extends Thread {
 	
@@ -24,17 +24,17 @@ public class ThreadClient extends Thread {
 	
 	
 	// TODO: Add a queue system
-	private Queue<Packet> sendToClientQueue = new LinkedList<Packet>();
-	private Queue<Packet> sendToServerQueue = new LinkedList<Packet>();
+	public BlockingQueue<Packet> sendToClientQueue = new LinkedBlockingQueue<Packet>();
+	public BlockingQueue<Packet> sendToServerQueue = new LinkedBlockingQueue<Packet>();
 	
-	private Queue<Packet> receiveFromClientQueue = new LinkedList<Packet>();
-	private Queue<Packet> receiveFromServerQueue = new LinkedList<Packet>();
+	public BlockingQueue<Packet> receiveFromClientQueue = new LinkedBlockingQueue<Packet>();
+	public BlockingQueue<Packet> receiveFromServerQueue = new LinkedBlockingQueue<Packet>();
 	
 	private Player player;
 	
 	public ThreadClient(Socket clientSocket) throws UnknownHostException, IOException {
 		this.clientSocket = clientSocket;
-		this.serverSocket = new Socket("127.0.0.1", 21022);
+		this.serverSocket = new Socket("127.0.0.1", 21024);
 		this.packetHandler = new PacketHandler(this);
 	}
 	
@@ -68,8 +68,6 @@ public class ThreadClient extends Thread {
 			e.printStackTrace();
 			System.out.println("Could not create Input and Output streams!");
 		}
-		
-		
 	}
 	
 	public void setPlayer(Player player) {
@@ -100,25 +98,17 @@ public class ThreadClient extends Thread {
 		return clientStreams;
 	}
 	
-	public void sendPacketToClient(Packet packet) {
-		try {
-			packet.writePacket(clientStreams.getOutputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void sendPacketToServer(Packet packet) {
-		try {
-			packet.writePacket(clientStreams.getOutputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+	public Packet take(BlockingQueue<Packet> bq) {
+        try {
+            return bq.take();
+        } catch(InterruptedException ie) {
+            return null;
+        }
+    }
 	
 	public void disconnect() {
 		Wrapper.getServer().playerList.disconnect(this);
 		forwardServer.setRunning(false);
-		forwardServer.setRunning(false);
+		forwardClient.setRunning(false);
 	}
 }
