@@ -3,6 +3,10 @@ package io.lgs.starbound;
 import io.lgs.starbound.file.BanList;
 import io.lgs.starbound.file.ServerProperties;
 import io.lgs.starbound.proxy.ThreadClient;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -16,6 +20,15 @@ public class PlayerList {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void attemptLogin(Socket clientSocket) throws UnknownHostException, IOException {
+		//if (!banList.getBans().isEmpty() && banList.getBans() != null && banList.getBans().contains(clientSocket.getInetAddress().getHostAddress()))
+			//return;
+		
+		ThreadClient client = new ThreadClient(clientSocket);
+		clients.add(client);
+		client.start();
 	}
 	
 	public void disconnect(ThreadClient client) {

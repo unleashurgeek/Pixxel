@@ -17,8 +17,8 @@ public class StarboundServer {
 		BufferedReader starboundConsole;
 		
 		try {
-			starbound = starboundBuilder.start();
-			starboundConsole = new BufferedReader(new InputStreamReader(starbound.getInputStream()));
+			//starbound = starboundBuilder.start();
+			//starboundConsole = new BufferedReader(new InputStreamReader(starbound.getInputStream()));
 			
 			// Start Proxy
 			proxy = new ThreadProxy();
@@ -28,11 +28,11 @@ public class StarboundServer {
 			new AegisServer(this, playerList, properties);
 			
 			// Started Console Monitor Thread
-			ThreadConsole console = new ThreadConsole(starboundConsole);
-			console.start();
-			version = console.getVersion();
+			//ThreadConsole console = new ThreadConsole(starboundConsole);
+			//console.start();
+			//version = console.getVersion();
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

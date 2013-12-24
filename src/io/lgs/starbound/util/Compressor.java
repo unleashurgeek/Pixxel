@@ -69,7 +69,7 @@ public class Compressor {
 
 		try
 		{
-			// TODO: CHeck this
+			// TODO: Check this
 			//while (inflater.needsInput() == false)
 			while (numberOfBytesDecompressedSoFar < bufferSizeInBytes)
 			{

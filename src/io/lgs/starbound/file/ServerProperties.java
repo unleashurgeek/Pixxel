@@ -12,6 +12,8 @@ public class ServerProperties {
 	private final Properties serverProperties;
 	private final File propertiesFile;
 	
+	// TOOD: Write checker to replace Server.properties on update
+	
 	//---- Server Properties Data ----	
 	
 	/** Location of starbound_server(.exe) */

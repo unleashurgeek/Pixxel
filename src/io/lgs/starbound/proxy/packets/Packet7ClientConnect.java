@@ -51,7 +51,7 @@ public class Packet7ClientConnect extends Packet {
 
 	@Override
 	public void processPacket(PacketHandler packetHandler) {
-		// This packet never should be processed, only read.
+		packetHandler.handleConnect(this);
 	}
 
 	@Override

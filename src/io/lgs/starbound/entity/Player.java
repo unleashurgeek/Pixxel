@@ -50,7 +50,7 @@ public class Player {
 	}
 	
 	public void sendMessage(String message, ChatColor color) {
-		client.sendPacketToClient(new Packet11ChatSend(message));
+		client.getPacketHandler().sendPacketToClient(new Packet11ChatSend(message));
 		// Write sends. Main use of this will be for plugins using  
 	}
 }

@@ -6,7 +6,6 @@ import io.lgs.starbound.util.Compressor;
 import io.lgs.starbound.util.IntHashMap;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.HashMap;
@@ -70,70 +69,45 @@ public abstract class Packet {
 	 * Returns the ID of this packet.
 	 */
 	public final int getPacketId() {
-		return ((Integer)packetClassToIdMap.get(this.getClass())).intValue();
-	}
-	
-	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput)
-			throws IOException {
-		return fetchRawPacket(dataInput, null);
-	}
-
-	public static RawPacket fetchRawPacket(ByteArrayDataInput dataInput,
-			RawPacket pkt) throws IOException {
-		if (pkt == null) {
-			pkt = new RawPacket();
-			pkt.type = dataInput.readVLQ();
-			pkt.data_length = dataInput.readSVLQ();
-
-			if (pkt.data_length < 0) {
-				pkt.data_length = (-pkt.data_length);
-				pkt.zlib = true;
-			}
-			System.out.println(pkt.data_length);
-			pkt.data = new byte[pkt.data_length];
-			pkt.data_pos = dataInput.readBytes(pkt.data);
-
-			if (pkt.data_pos == pkt.data_length) {
-				pkt.eop = true;
-				return pkt;
-			}
-		} else if (!pkt.eop) {
-			pkt.data_pos = dataInput.readBytes(pkt.data, pkt.data_pos,
-					pkt.data_length - pkt.data_pos);
-
-			if (pkt.data_pos == pkt.data_length) {
-				pkt.eop = true;
-				return pkt;
-			} else {
-				pkt.eop = false;
-			}
-		}
-
-		return pkt;
+		return packetClassToIdMap.get(this.getClass()) == null ? 0 : (Integer)packetClassToIdMap.get(this.getClass()).intValue();
 	}
 
 	/**
 	 * Parse a packet, prefixed by its ID, from the raw packet data.
 	 */
-	public static Packet readPacket(RawPacket rawPacket, boolean isServer) throws IOException {
+	public static Packet readPacket(RawPacket rawPacket, boolean isToServer) throws IOException {
 		Packet packet = null;
 		int packetID = rawPacket.type;
 		ByteArrayDataInput byteArrayDataInput;
 		
-		if (isServer && !serverPacketIdList.contains(packetID) || !isServer
+		if (isToServer && !serverPacketIdList.contains(packetID) || !isToServer
 				&& !clientPacketIdList.contains(packetID)) {
-			return null;
+			packet = new Packet0Generic(isToServer);
+			
+			((Packet0Generic)packet).type 	= rawPacket.type;
+			((Packet0Generic)packet).length = rawPacket.data_length;
+			((Packet0Generic)packet).data	= rawPacket.data;
+			
+			return packet;
 		}
 		
 		packet = getNewPacket(packetID);
-		if (packet == null)
-			return null;
-		
-		if (rawPacket.zlib) {
-			rawPacket.data = Compressor.decompress(rawPacket.data);
+		if (packet == null) {
+			packet = new Packet0Generic(isToServer);
+			((Packet0Generic)packet).type 	= rawPacket.type;
+			((Packet0Generic)packet).length = rawPacket.data_length;
+			((Packet0Generic)packet).data	= rawPacket.data;
+			
+			return packet;
 		}
 		
-		byteArrayDataInput = new ByteArrayDataInput(rawPacket.data);
+		byte[] buff = rawPacket.data;
+		
+		if (rawPacket.zlib) {
+			buff = Compressor.decompress(rawPacket.data);
+		}
+		
+		byteArrayDataInput = new ByteArrayDataInput(buff);
 		packet.readPacketData(byteArrayDataInput);
 		
 		return packet;
@@ -147,15 +121,25 @@ public abstract class Packet {
 	 * Writes a packet, prefixed by its ID, to the data stream.
 	 */
 	public static void writePacket(Packet packet, ByteArrayDataOutputStream dataOutput) throws IOException {
+		if (packet.getPacketId() == 0) {
+			dataOutput.writeVLQ(((Packet0Generic)packet).type);
+			dataOutput.writeSVLQ(((Packet0Generic)packet).length);
+			dataOutput.writeBytes(((Packet0Generic)packet).data);
+			dataOutput.flush();
+			return;
+		}
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ByteArrayDataOutputStream bados = new ByteArrayDataOutputStream(baos);
-		packet.writePacket(bados);
-		bados.flush();
+		packet.writePacketData(bados);
+		System.out.println("Wrote Packet Data");
+		//bados.flush();
 		byte[] data = baos.toByteArray();
 		bados.close();
 		
 		if (packet.getPacketSize() > 255) {
 			data = Compressor.compress(data);
+			System.out.println("Packet compressed");
 			packet.isCompressed = true;
 		}
 		
@@ -166,6 +150,7 @@ public abstract class Packet {
 			dataOutput.writeSVLQ(packet.getPacketSize());
 		dataOutput.writeBytes(data);
 		dataOutput.flush();
+		System.out.println("Packet Flushed");
 	}
 	
 	/**
@@ -200,7 +185,7 @@ public abstract class Packet {
 		//addIdClassMapping(1, true, false, Packet1ProtocolVersion.class);
 		//addIdClassMapping(2, true, false, Packet2ConnectResponse.class);
 		//addIdClassMapping(5, true, false, Packet5ChatReceive.class);
-		addIdClassMapping(7, false, true, Packet7ClientConnect.class);
+		//addIdClassMapping(7, false, true, Packet7ClientConnect.class);
 		//addIdClassMapping(11, false, true, Packet11ChatSend.class);
 	}
 }

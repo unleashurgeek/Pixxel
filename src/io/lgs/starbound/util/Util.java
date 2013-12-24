@@ -3,6 +3,8 @@ package io.lgs.starbound.util;
 import java.io.IOException;
 
 public class Util {
+	public final static int BUFFER_SIZE = 1460;
+	
 	// Converts hexString to hexArrayS
 	public static byte[] hexStringToByteArray(String s) {
 		int len = s.length();

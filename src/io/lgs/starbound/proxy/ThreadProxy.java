@@ -10,7 +10,7 @@ public class ThreadProxy extends Thread {
 	
 	private ServerSocket serverSocket;
 	
-	public ThreadProxy() { }
+	public ThreadProxy() {}
 	
 	 @Override
 	public void run() {
@@ -22,13 +22,6 @@ public class ThreadProxy extends Thread {
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("proxy: Connection recieved from " + clientSocket.getInetAddress().getHostAddress());
 				Wrapper.getServer().playerList.attemptLogin(clientSocket);
-				try {
-					System.out.println("here");
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 			
 		} catch (IOException e) {
