@@ -11,6 +11,8 @@ public class Packet0Generic extends Packet {
 	public int length;
 	public byte[] data;
 	
+	public boolean isCompressed;
+	
 	public boolean isToServer;
 	
 	public Packet0Generic(boolean isToServer) { 

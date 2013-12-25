@@ -87,6 +87,7 @@ public abstract class Packet {
 			((Packet0Generic)packet).type 	= rawPacket.type;
 			((Packet0Generic)packet).length = rawPacket.data_length;
 			((Packet0Generic)packet).data	= rawPacket.data;
+			((Packet0Generic)packet).isCompressed = rawPacket.zlib;
 			
 			return packet;
 		}
@@ -97,6 +98,7 @@ public abstract class Packet {
 			((Packet0Generic)packet).type 	= rawPacket.type;
 			((Packet0Generic)packet).length = rawPacket.data_length;
 			((Packet0Generic)packet).data	= rawPacket.data;
+			((Packet0Generic)packet).isCompressed = rawPacket.zlib;
 			
 			return packet;
 		}
@@ -123,7 +125,8 @@ public abstract class Packet {
 	public static void writePacket(Packet packet, ByteArrayDataOutputStream dataOutput) throws IOException {
 		if (packet.getPacketId() == 0) {
 			dataOutput.writeVLQ(((Packet0Generic)packet).type);
-			dataOutput.writeSVLQ(((Packet0Generic)packet).length);
+			if (((Packet0Generic)packet).isCompressed)
+				dataOutput.writeSVLQ(-((Packet0Generic)packet).length);
 			dataOutput.writeBytes(((Packet0Generic)packet).data);
 			dataOutput.flush();
 			return;
