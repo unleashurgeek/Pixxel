@@ -4,10 +4,12 @@ import io.lgs.starbound.util.ByteArrayDataInput;
 import io.lgs.starbound.util.ByteArrayDataOutputStream;
 import io.lgs.starbound.util.Compressor;
 import io.lgs.starbound.util.IntHashMap;
+import io.lgs.starbound.util.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -85,7 +87,7 @@ public abstract class Packet {
 			packet = new Packet0Generic(isToServer);
 			
 			((Packet0Generic)packet).type 	= rawPacket.type;
-			((Packet0Generic)packet).length = rawPacket.data_length;
+			((Packet0Generic)packet).size = rawPacket.data_length;
 			((Packet0Generic)packet).data	= rawPacket.data;
 			((Packet0Generic)packet).isCompressed = rawPacket.zlib;
 			
@@ -96,7 +98,7 @@ public abstract class Packet {
 		if (packet == null) {
 			packet = new Packet0Generic(isToServer);
 			((Packet0Generic)packet).type 	= rawPacket.type;
-			((Packet0Generic)packet).length = rawPacket.data_length;
+			((Packet0Generic)packet).size = rawPacket.data_length;
 			((Packet0Generic)packet).data	= rawPacket.data;
 			((Packet0Generic)packet).isCompressed = rawPacket.zlib;
 			
@@ -124,11 +126,17 @@ public abstract class Packet {
 	 */
 	public static void writePacket(Packet packet, ByteArrayDataOutputStream dataOutput) throws IOException {
 		if (packet.getPacketId() == 0) {
-			dataOutput.writeVLQ(((Packet0Generic)packet).type);
-			if (((Packet0Generic)packet).isCompressed)
-				dataOutput.writeSVLQ(-((Packet0Generic)packet).length);
-			dataOutput.writeBytes(((Packet0Generic)packet).data);
-			dataOutput.flush();
+			if (((Packet0Generic)packet).isCompressed) {
+				dataOutput.writeVLQ(((Packet0Generic)packet).type);
+				dataOutput.writeSVLQ(-((Packet0Generic)packet).size + 2);
+				dataOutput.writeBytes(((Packet0Generic)packet).data);
+				dataOutput.flush();
+			} else {
+				dataOutput.writeVLQ(((Packet0Generic)packet).type);
+				dataOutput.writeSVLQ(((Packet0Generic)packet).size);
+				dataOutput.writeBytes(((Packet0Generic)packet).data);
+				dataOutput.flush();
+			}
 			return;
 		}
 		

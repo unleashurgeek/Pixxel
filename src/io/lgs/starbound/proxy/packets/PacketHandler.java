@@ -16,7 +16,7 @@ public class PacketHandler {
 		// TODO: Check if he is admin
 		
 		client.setPlayer(p);
-		sendPacketToClient(packet);
+		sendPacketToServer(packet);
 	}
 	
 	public void handleChatSend(Packet11ChatSend packet) {

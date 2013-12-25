@@ -37,6 +37,10 @@ public class ThreadReadPacket extends Thread {
 			int size;
 			while (isRunning && (size = input.read(buffer)) != -1) {
 				byte[] temp_buffer = Arrays.copyOfRange(buffer, 0, size);
+				if (temp_buffer[0] == (byte)0x07) {
+					System.out.println(temp_buffer.length);
+					System.out.println(Arrays.toString(temp_buffer));
+				}
 				ByteArrayDataInput barr = new ByteArrayDataInput(temp_buffer);
 				
 				if (pkt == null || pkt.eop) {

@@ -1,6 +1,7 @@
 package io.lgs.starbound.util;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Util {
 	public final static int BUFFER_SIZE = 1460;
@@ -61,6 +62,19 @@ public class Util {
 	public static byte[] encodeSInt(int value) throws IOException {
 		return encodeVLQ(encodeZigZag32(value));
 	}
+	
+	 public static byte[][] divideArray(byte[] source, int chunksize) {
+	        byte[][] ret = new byte[(int)Math.ceil(source.length / (double)chunksize)][chunksize];
+
+	        int start = 0;
+
+	        for(int i = 0; i < ret.length; i++) {
+	            ret[i] = Arrays.copyOfRange(source,start, start + chunksize);
+	            start += chunksize ;
+	        }
+
+	        return ret;
+	    }
 
 	/**
 	 * Converts long to VLQ byte[]

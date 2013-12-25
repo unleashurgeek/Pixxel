@@ -43,13 +43,13 @@ public class ByteArrayDataOutputStream extends FilterOutputStream implements Dat
     }
 	
 	public void writeVLQ(int n) throws IOException {
-		int numRelevantBits = 32 - Integer.numberOfLeadingZeros(n);
+		int numRelevantBits = 64 - Long.numberOfLeadingZeros(n);
 		int numBytes = (numRelevantBits + 6) / 7;
 		if (numBytes == 0)
 			numBytes = 1;
 		byte[] output = new byte[numBytes];
 		for (int i = numBytes - 1; i >= 0; i--) {
-			int curByte = (int)(n & 0x7F);
+			int curByte = (int) (n & 0x7F);
 			if (i != (numBytes - 1))
 				curByte |= 0x80;
 			output[i] = (byte) curByte;
