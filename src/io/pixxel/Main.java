@@ -7,6 +7,7 @@ import java.io.IOException;
 import io.pixxel.file.ServerProperties;
 
 public class Main {
+	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		
 		File propertiesFile = new File("server.properties");
