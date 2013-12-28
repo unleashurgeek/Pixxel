@@ -1,6 +1,6 @@
 package io.lgs.starbound.proxy;
 
-import io.lgs.starbound.Wrapper;
+import io.lgs.starbound.Pixxel;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -21,7 +21,7 @@ public class ThreadProxy extends Thread {
 				
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("proxy: Connection recieved from " + clientSocket.getInetAddress().getHostAddress());
-				Wrapper.getServer().playerList.attemptLogin(clientSocket);
+				Pixxel.getServer().playerList.attemptLogin(clientSocket);
 			}
 			
 		} catch (IOException e) {
@@ -31,7 +31,7 @@ public class ThreadProxy extends Thread {
 	}
 	 
 	public void kill() throws IOException {
-		Wrapper.getServer().kickAll();
+		Pixxel.getServer().kickAll();
 		serverSocket.close();
 	}
 }

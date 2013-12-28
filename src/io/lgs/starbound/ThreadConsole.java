@@ -19,11 +19,11 @@ public class ThreadConsole extends Thread {
 		try {
 			for (String line; (line = starboundConsole.readLine()) != null;) {
 				boolean showLine = true; 
-				if (line.startsWith("Warn: ") && !Wrapper.getServer().getConfig().showWarnings())
+				if (line.startsWith("Warn: ") && !Pixxel.getServer().getConfig().showWarnings())
 					showLine = false;
-				else if (line.startsWith("liquid error") && !Wrapper.getServer().getConfig().showLiquidError())
+				else if (line.startsWith("liquid error") && !Pixxel.getServer().getConfig().showLiquidError())
 					showLine = false;
-				else if (line.startsWith("Error: ") && !Wrapper.getServer().getConfig().showError())
+				else if (line.startsWith("Error: ") && !Pixxel.getServer().getConfig().showError())
 					showLine = false;
 				
 				// TODO: Replace with PacketHandler
@@ -34,7 +34,7 @@ public class ThreadConsole extends Thread {
 						username.append(parts[i]);
 					}
 					
-					Player player = Wrapper.getServer().getPlayer(username.toString());
+					Player player = Pixxel.getServer().getPlayer(username.toString());
 					player.kickPlayer();
 					System.out.println("player kicked?");
 				}

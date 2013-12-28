@@ -25,7 +25,7 @@ public class StarboundServer {
 			proxy.start();
 			
 			PlayerList playerList = new PlayerList(this, properties);
-			new AegisServer(this, playerList, properties);
+			new PixxelServer(this, playerList, properties);
 			
 			// Started Console Monitor Thread
 			//ThreadConsole console = new ThreadConsole(starboundConsole);
@@ -48,7 +48,7 @@ public class StarboundServer {
 			e.printStackTrace();
 		}
 		starbound.destroy();
-		Wrapper.getServer().playerList.clients.clear();
+		Pixxel.getServer().playerList.clients.clear();
 		// TODO: Clear all data sheats (Players connected, etc)
 	}
 }
