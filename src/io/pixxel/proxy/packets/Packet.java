@@ -4,12 +4,9 @@ import io.pixxel.util.ByteArrayDataInput;
 import io.pixxel.util.ByteArrayDataOutputStream;
 import io.pixxel.util.Compressor;
 import io.pixxel.util.IntHashMap;
-import io.pixxel.util.Util;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

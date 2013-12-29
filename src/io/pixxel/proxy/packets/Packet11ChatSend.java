@@ -37,8 +37,12 @@ public class Packet11ChatSend extends Packet {
 
 	@Override
 	public int getPacketSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		int size = 0;
+		if (message.length() == 0)
+			size +=2;
+		else
+			size += message.length() +1;
+		return size;
 	}
 
 }
