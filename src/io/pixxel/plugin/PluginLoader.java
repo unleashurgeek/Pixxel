@@ -23,6 +23,7 @@ import org.w3c.dom.events.Event;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import io.pixxel.PixxelServer;
+import io.pixxel.event.EventHandler;
 
 public final class PluginLoader {
 	final PixxelServer server;
