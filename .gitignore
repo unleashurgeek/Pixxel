@@ -33,3 +33,26 @@ local.properties
 *.ear
 /Bans.txt
 /server.properties
+
+# Intellij
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.classpath
+.project
+
+# Maven
+target/
+
+# Netbeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
