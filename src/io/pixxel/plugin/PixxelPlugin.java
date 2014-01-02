@@ -3,9 +3,9 @@ package io.pixxel.plugin;
 import io.pixxel.PixxelServer;
 
 import java.io.File;
+import java.util.logging.Logger;
 
-import com.sun.istack.internal.logging.Logger;
-
+// TODO: GOOD
 public class PixxelPlugin implements Plugin {
 	private boolean isEnabled = false;
 	private PluginLoader loader = null;
@@ -79,7 +79,7 @@ public class PixxelPlugin implements Plugin {
 		this.logger = new PluginLogger(this);
 	}
 	
-	public boolean onCommand(/*CommandSender sender,*/ Command command, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		return false;
 	}
 	

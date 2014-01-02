@@ -3,13 +3,12 @@ package io.pixxel.plugin;
 import io.pixxel.PixxelServer;
 
 import java.io.File;
+import java.util.logging.Logger;
 
-import com.sun.istack.internal.logging.Logger;
-
+// TODO: GOOD
 public interface Plugin {
 	
 	public File getDataFolder();
-	
 	
 	public PluginDescription getDescription();
 	

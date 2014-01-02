@@ -1,5 +1,8 @@
 package io.pixxel.plugin;
 
+import io.pixxel.permissions.Permission;
+import io.pixxel.permissions.PermissionDefault;
+
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -8,13 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.ImmutableDescriptor;
-
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
-
-
+//TODO: GOOD
 public final class PluginDescription {
 	private static final Yaml yaml = new Yaml(new SafeConstructor());
 	
@@ -34,7 +34,7 @@ public final class PluginDescription {
 	private Map<?, ?> simplePermissions = null;
 	private PermissionDefault defaultPerm = PermissionDefault.OP;
 	
-	public PluginDescription(final InputStream stream) {
+	public PluginDescription(final InputStream stream) throws InvalidDescriptionException {
 		loadMap(asMap(yaml.load(stream)));
 	}
 	
@@ -48,30 +48,34 @@ public final class PluginDescription {
 		yaml.dump(saveMap(), writer);
 	}
 	
-	private void loadMap(Map<?, ?> map) {
+	private void loadMap(Map<?, ?> map) throws InvalidDescriptionException {
 		try {
 			name = map.get("name").toString();
 			
 			if (!name.matches("^[A-Za-z0-9 _.-]+$")) {
-				System.out.println("Name in plugin.yml contains invalid characters!");
+				throw new InvalidDescriptionException("name '" + name + "' contains invalid characters.");
 			}
 		} catch (NullPointerException e) {
-			System.out.println("Name is Null!");
-		} 
+			throw new InvalidDescriptionException(e, "name is not defined");
+		}  catch (ClassCastException e) {
+			throw new InvalidDescriptionException(e, "name is of wrong type");
+		}
 		
 		try {
 			version = map.get("version").toString();
 		} catch (NullPointerException e) {
-			System.out.println("Version is not defined!");
+			throw new InvalidDescriptionException(e, "Version is not defined!");
 		}
 		
 		try {
 			main = map.get("main").toString();
 			if (main.startsWith("io.pixxel")) {
-				System.out.println("Package can not start with io.pixxel!");
+				throw new InvalidDescriptionException("package can not start with io.pixxel");
 			}
 		} catch (NullPointerException e) {
-			System.out.println("Main is Null!");
+			throw new InvalidDescriptionException(e, "main is not defined");
+		} catch (ClassCastException e) {
+			throw new InvalidDescriptionException(e, "main is of wrong type");
 		}
 		
 		if (map.get("commands") != null) {
@@ -99,7 +103,7 @@ public final class PluginDescription {
 					commandsMap.put(command.getKey().toString(), commandMap);
 				}
 			} catch (ClassCastException e) {
-				System.out.println("Commands are of wrong type");
+				throw new InvalidDescriptionException(e, "commands are of wrong type");
 			}
 			
 			commands = commandsMap;
@@ -124,9 +128,9 @@ public final class PluginDescription {
 					dependent.add(dependency.toString());
 				}
 			} catch (ClassCastException e) {
-				System.out.println("Depend is not a string!");
+				throw new InvalidDescriptionException(e, "depend is of wrong type");
 			} catch (NullPointerException e) {
-				System.out.println("Invalid Dependency Format");
+				throw new InvalidDescriptionException(e, "invalid dependency format");
 			}
 			depend = dependent;
 		}
@@ -138,9 +142,9 @@ public final class PluginDescription {
 					dependent.add(dependency.toString());
 				}
 			} catch (ClassCastException e) {
-				System.out.println("softdepend is not a string!");
+				throw new InvalidDescriptionException(e, "softdepend is of wrong type");
 			} catch (NullPointerException e) {
-				System.out.println("Invalid Soft-Dependency Format");
+				throw new InvalidDescriptionException(e, "invalid soft-dependency format");
 			}
 			softDepend = dependent;
 		}
@@ -152,9 +156,9 @@ public final class PluginDescription {
 					loadBeforeList.add(dependency.toString());
 				}
 			} catch (ClassCastException e) {
-				System.out.println("loadbefore is not a string!");
+				throw new InvalidDescriptionException(e, "loadbefore is of wrong type");
 			} catch (NullPointerException e) {
-				System.out.println("Invalid load-before Format");
+				throw new InvalidDescriptionException(e, "invalid load-before format");
 			}
 			loadBefore = loadBeforeList;
 		}
@@ -166,9 +170,9 @@ public final class PluginDescription {
 					authorsMap.add(o.toString());
 				}
 			} catch (ClassCastException e) {
-				System.out.println("Authors are the wrong type");
+				throw new InvalidDescriptionException(e, "authors are of wrong type");
 			} catch (NullPointerException e) {
-				System.out.println("Authors are improperly defined!");
+				throw new InvalidDescriptionException(e, "authors are improperly defined");
 			}
 			authors = authorsMap;
 		} else if (map.get("author") != null) {
@@ -181,16 +185,16 @@ public final class PluginDescription {
 			try {
 				defaultPerm = PermissionDefault.getByName(map.get("default-permission").toString());
 			} catch (ClassCastException e) {
-				System.out.println("Default-permission is of wrong type");
+				throw new InvalidDescriptionException(e, "default-permission is of wrong type");
 			} catch (IllegalArgumentException e) {
-				System.out.println("default-permission is not a valid choice");
+				throw new InvalidDescriptionException(e, "default-permission is not a valid choice");
 			}
 		}
 		
 		try {
 			simplePermissions = (Map<?, ?>) map.get("permissions");
 		} catch (ClassCastException e) {
-			System.out.println("permissions are of the wrong type");
+			throw new InvalidDescriptionException(e, "permissions are of the wrong type");
 		}
 	}
 	
@@ -236,12 +240,12 @@ public final class PluginDescription {
 	}
 	
 	
-	private Map<?, ?> asMap(Object object) {
+	private Map<?, ?> asMap(Object object) throws InvalidDescriptionException {
 		if (object instanceof Map) {
 			return (Map<?, ?>) object;
 		}
 		
-		System.out.println("Plugin.yml is not properly formated!");
+		throw new InvalidDescriptionException(object + " is not properly structured.");
 	}
 	
 	public String getName() {
@@ -299,7 +303,7 @@ public final class PluginDescription {
 		return permissions;
 	}
 	
-	public PermissionsDefault getPermissionDefault() {
+	public PermissionDefault getPermissionDefault() {
 		return defaultPerm;
 	}
 	
