@@ -14,7 +14,6 @@ public class PluginClassLoader extends URLClassLoader {
 	private Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
 	private PluginDescription description;
 	private File dataFolder;
-	private File file;
 	PixxelPlugin plugin;
 	private PixxelPlugin  pluginInit;
 	private IllegalStateException pluginState;
@@ -28,8 +27,6 @@ public class PluginClassLoader extends URLClassLoader {
 		this.loader = loader;
 		this.description = description;
 		this.dataFolder = dataFolder;
-		this.file = file;
-		
 		try {
 			Class<?> jarClass;
 			try {
@@ -99,6 +96,6 @@ public class PluginClassLoader extends URLClassLoader {
 		pluginState = new IllegalStateException("Initial Initialization");
 		this.pluginInit = pixxelPlugin;
 		
-		pixxelPlugin.init(loader, loader.server, description, dataFolder, file, this);
+		pixxelPlugin.init(loader, loader.server, description, dataFolder, this);
 	}
 }

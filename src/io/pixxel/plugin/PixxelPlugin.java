@@ -1,6 +1,8 @@
 package io.pixxel.plugin;
 
 import io.pixxel.PixxelServer;
+import io.pixxel.command.Command;
+import io.pixxel.command.CommandSender;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -10,11 +12,9 @@ public class PixxelPlugin implements Plugin {
 	private boolean isEnabled = false;
 	private PluginLoader loader = null;
 	private PixxelServer server = null;
-	private File file = null;
 	private PluginDescription description = null;
 	private File dataFolder = null;
 	private ClassLoader classLoader = null;
-	private boolean naggable = true;
 	private PluginLogger logger = null;
 	
 	public PixxelPlugin() {
@@ -25,12 +25,12 @@ public class PixxelPlugin implements Plugin {
 		((PluginClassLoader) classLoader).initialize(this);
 	}
 	
-	protected PixxelPlugin(final PluginLoader loader, final PluginDescription description, final File dataFolder, final File file) {
+	protected PixxelPlugin(final PluginLoader loader, final PluginDescription description, final File dataFolder) {
 		final ClassLoader classLoader = this.getClass().getClassLoader();
 		if (classLoader instanceof PluginClassLoader) {
 			throw new IllegalStateException("Cannot use initialization constructor at runtime!");
 		}
-		init(loader, loader.server, description, dataFolder, file, classLoader);
+		init(loader, loader.server, description, dataFolder, classLoader);
 	}
 	
 	@Override
@@ -69,10 +69,9 @@ public class PixxelPlugin implements Plugin {
 		}
 	}
 	
-	final void init(PluginLoader loader, PixxelServer server, PluginDescription description, File dataFolder, File file, ClassLoader classLoader) {
+	final void init(PluginLoader loader, PixxelServer server, PluginDescription description, File dataFolder, ClassLoader classLoader) {
 		this.loader = loader;
 		this.server = server;
-		this.file = file;
 		this.description = description;
 		this.dataFolder = dataFolder;
 		this.classLoader = classLoader;

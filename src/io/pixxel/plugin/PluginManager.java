@@ -18,6 +18,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.pixxel.PixxelServer;
+import io.pixxel.command.Command;
+import io.pixxel.command.CommandMap;
+import io.pixxel.command.PluginCommandYamlParser;
 import io.pixxel.event.Event;
 import io.pixxel.event.EventPriority;
 import io.pixxel.event.HandlerList;
@@ -78,7 +81,6 @@ public final class PluginManager {
 	public Plugin[] loadPlugins(File directory) {
 		if (directory == null || !directory.isDirectory()) {
 			throw new IllegalArgumentException("Directory is eith null or not a directory!");
-			return null;
 		}
 		
 		List<Plugin> result = new ArrayList<Plugin>();
@@ -100,8 +102,12 @@ public final class PluginManager {
 			
 			if (loader == null) continue;
 			
-			// TODO: Surround description in InvalidDescriptionException Try/Catch
-			PluginDescription description = loader.getPluginDescription(file);
+			PluginDescription description = null;
+			try {
+				description = loader.getPluginDescription(file);
+			} catch (InvalidDescriptionException e) {
+				System.out.println("Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
+			}
 			
 			plugins.put(description.getName(), file);
 			
@@ -238,7 +244,6 @@ public final class PluginManager {
 	public synchronized Plugin loadPlugin(File file) throws InvalidPluginException, UnknownDependencyException {
 		if (file == null) {
 			throw new IllegalArgumentException("File cannnot be null when loading a plugin!");
-			return null;
 		}
 		
 		Set<Pattern> filters = fileAssociations.keySet();
@@ -379,19 +384,15 @@ public final class PluginManager {
 	public void registerEvent(Class<? extends Event> event, Listener listener, EventPriority priority, EventExecutor executor, Plugin plugin, boolean ignoreCancelled) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Listener cannot be null");
-			return;
 		}
 		if (priority == null) {
 			throw new IllegalArgumentException("EventPriority cannot be null");
-			return;
 		}
 		if (executor == null) {
 			throw new IllegalArgumentException("EventExecutor cannot be null");
-			return;
 		}
 		if (plugin == null) {
 			throw new IllegalArgumentException("Plugin cannot be null");
-			return;
 		}
 		
 		if (!plugin.isEnabled()) {

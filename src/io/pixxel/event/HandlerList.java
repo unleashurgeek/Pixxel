@@ -1,6 +1,7 @@
 package io.pixxel.event;
 
 import io.pixxel.plugin.Plugin;
+import io.pixxel.plugin.RegisteredListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +89,7 @@ public class HandlerList {
 	public synchronized void unregister(Listener listener) {
 		boolean changed = false;
 		for (List<RegisteredListener> list : handlerSlots.values()) {
-			for (ListIterator<RegisteredListener> i = list.listIteretator(); i.hasNext();) {
+			for (ListIterator<RegisteredListener> i = list.listIterator(); i.hasNext();) {
 				if (i.next().getListener().equals(listener)) {
 					i.remove();
 					changed = true;
