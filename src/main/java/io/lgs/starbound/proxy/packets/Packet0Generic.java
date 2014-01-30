@@ -7,11 +7,7 @@ import java.io.IOException;
 
 public class Packet0Generic extends Packet {
 	
-	public int type;
-	public int size;
-	public byte[] data;
-	
-	public boolean isCompressed;
+	public RawPacket packet;
 	
 	public boolean isToServer;
 	

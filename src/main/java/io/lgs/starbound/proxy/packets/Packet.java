@@ -4,12 +4,10 @@ import io.lgs.starbound.util.ByteArrayDataInput;
 import io.lgs.starbound.util.ByteArrayDataOutputStream;
 import io.lgs.starbound.util.Compressor;
 import io.lgs.starbound.util.IntHashMap;
-import io.lgs.starbound.util.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -85,11 +83,7 @@ public abstract class Packet {
 		if (isToServer && !serverPacketIdList.contains(packetID) || !isToServer
 				&& !clientPacketIdList.contains(packetID)) {
 			packet = new Packet0Generic(isToServer);
-			
-			((Packet0Generic)packet).type 	= rawPacket.type;
-			((Packet0Generic)packet).size = rawPacket.data_length;
-			((Packet0Generic)packet).data	= rawPacket.data;
-			((Packet0Generic)packet).isCompressed = rawPacket.zlib;
+			((Packet0Generic)packet).packet = rawPacket;
 			
 			return packet;
 		}
@@ -97,10 +91,7 @@ public abstract class Packet {
 		packet = getNewPacket(packetID);
 		if (packet == null) {
 			packet = new Packet0Generic(isToServer);
-			((Packet0Generic)packet).type 	= rawPacket.type;
-			((Packet0Generic)packet).size = rawPacket.data_length;
-			((Packet0Generic)packet).data	= rawPacket.data;
-			((Packet0Generic)packet).isCompressed = rawPacket.zlib;
+			((Packet0Generic)packet).packet = rawPacket;
 			
 			return packet;
 		}
@@ -126,15 +117,16 @@ public abstract class Packet {
 	 */
 	public static void writePacket(Packet packet, ByteArrayDataOutputStream dataOutput) throws IOException {
 		if (packet.getPacketId() == 0) {
-			if (((Packet0Generic)packet).isCompressed) {
-				dataOutput.writeVLQ(((Packet0Generic)packet).type);
-				dataOutput.writeSVLQ(-((Packet0Generic)packet).size + 2);
-				dataOutput.writeBytes(((Packet0Generic)packet).data);
-				dataOutput.flush();
+			dataOutput.writeVLQ(((Packet0Generic)packet).packet.type);
+			if (((Packet0Generic)packet).packet.zlib) {
+				dataOutput.writeSVLQ(-((Packet0Generic)packet).packet.data_length);
+				for (byte[] row : ((Packet0Generic)packet).packet.dataParts) {
+					dataOutput.writeBytes(row);
+					dataOutput.flush();
+				}
 			} else {
-				dataOutput.writeVLQ(((Packet0Generic)packet).type);
-				dataOutput.writeSVLQ(((Packet0Generic)packet).size);
-				dataOutput.writeBytes(((Packet0Generic)packet).data);
+				dataOutput.writeSVLQ(((Packet0Generic)packet).packet.data_length);
+				dataOutput.writeBytes(((Packet0Generic)packet).packet.data);
 				dataOutput.flush();
 			}
 			return;
@@ -144,7 +136,6 @@ public abstract class Packet {
 		ByteArrayDataOutputStream bados = new ByteArrayDataOutputStream(baos);
 		packet.writePacketData(bados);
 		System.out.println("Wrote Packet Data");
-		//bados.flush();
 		byte[] data = baos.toByteArray();
 		bados.close();
 		
