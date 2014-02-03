@@ -6,6 +6,7 @@ import io.pixxel.util.ChatColor;
 
 import java.net.InetAddress;
 
+// TODO: Redo
 public class Player {
 	private final String username;
 	private final ThreadClient client;

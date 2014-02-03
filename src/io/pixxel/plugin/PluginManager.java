@@ -14,9 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.pixxel.Pixxel;
 import io.pixxel.PixxelServer;
 import io.pixxel.command.Command;
 import io.pixxel.command.CommandMap;
@@ -106,7 +108,7 @@ public final class PluginManager {
 			try {
 				description = loader.getPluginDescription(file);
 			} catch (InvalidDescriptionException e) {
-				System.out.println("Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
+				Pixxel.getServer().getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
 			}
 			
 			plugins.put(description.getName(), file);
@@ -161,7 +163,7 @@ public final class PluginManager {
 							softDependencies.remove(plugin);
 							dependencies.remove(plugin);
 							
-							System.out.println("Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
+							Pixxel.getServer().getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
 							break;
 						}
 					}
@@ -197,7 +199,7 @@ public final class PluginManager {
 						loadedPlugins.add(plugin);
 						continue;
 					} catch (InvalidPluginException e) {
-						System.out.println("Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
+						Pixxel.getServer().getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
 					}
 				}
 			}
@@ -219,7 +221,7 @@ public final class PluginManager {
 							loadedPlugins.add(plugin);
 							break;
 						} catch (InvalidPluginException e) {
-							System.out.println("Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
+							Pixxel.getServer().getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
 						}
 					}
 				}
@@ -232,7 +234,7 @@ public final class PluginManager {
 					while (failedPluginIterator.hasNext()) {
 						File file = failedPluginIterator.next();
 						failedPluginIterator.remove();
-                        System.out.println("Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "': circular dependency detected");
+						Pixxel.getServer().getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "': circular dependency detected");
 					}
 				}
 			}
@@ -295,7 +297,7 @@ public final class PluginManager {
 			try {
 				plugin.getPluginLoader().enablePlugin(plugin);
 			} catch (Throwable t) {
-				System.out.println("Error occurred (in the plugin loader) while enabling " + plugin.getDescription().getFullName() + "(Is it up to date?)");
+				Pixxel.getServer().getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while enabling " + plugin.getDescription().getFullName() + "(Is it up to date?)");
 			}
 			
 			HandlerList.bakeAll();
@@ -334,9 +336,9 @@ public final class PluginManager {
 			if (Thread.holdsLock(this)) {
 				throw new IllegalStateException(event.getEventName() + " cannot be triggered asynchronously from inside syncrhonized code.");
 			}
-			if (server.isPrimaryThread()) {
+			/*if (server.isPrimaryThread()) {
 				throw new IllegalStateException(event.getEventName() + " cannot be triggered asynchronously from primary server thread");
-			}
+			}*/
 			fireEvent(event);
 		} else {
 			synchronized (this) {
@@ -358,11 +360,10 @@ public final class PluginManager {
 				registration.callEvent(event);
 			} catch (AuthorNagException e) {
 				Plugin plugin = registration.getPlugin();
-				
-				System.out.println(String.format("Nag Author(s): '%s' of '%s' about the following: %s",
+				Pixxel.getServer().getLogger().log(Level.WARNING, String.format("Nag Author(s): '%s' of '%s' about the following: %s",
 						plugin.getDescription().getAuthors(), plugin.getDescription().getFullName(), e.getMessage()));
 			} catch (Throwable t) {
-				System.out.println("Could not pass event " + event.getEventName() + " to " + registration.getPlugin().getDescription().getFullName());
+				Pixxel.getServer().getLogger().log(Level.SEVERE, "Could not pass event " + event.getEventName() + " to " + registration.getPlugin().getDescription().getFullName());
 			}
 		}
 	}

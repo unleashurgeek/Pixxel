@@ -7,6 +7,7 @@ import io.pixxel.proxy.packets.PacketHandler;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 
 public class ThreadClient extends Thread {
 	
@@ -68,10 +69,8 @@ public class ThreadClient extends Thread {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Could not create Input and Output streams!");
+			Pixxel.getServer().getLogger().log(Level.SEVERE, "Could not create input and output streams for player at IP " + clientSocket.getInetAddress().getHostAddress());
 		}
-		
-		
 	}
 	
 	public void setPlayer(Player player) {

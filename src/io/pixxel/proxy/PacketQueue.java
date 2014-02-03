@@ -1,8 +1,10 @@
 package io.pixxel.proxy;
 
+import io.pixxel.Pixxel;
 import io.pixxel.proxy.packets.Packet;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
 
 
 public class PacketQueue extends ConcurrentLinkedQueue<Packet> {
@@ -17,13 +19,13 @@ public class PacketQueue extends ConcurrentLinkedQueue<Packet> {
 		try {
 			this.add(packet);
 		} catch(NullPointerException e) {
-			System.out.println("ERROR: Packet was not able to be sent to Queue! Packet ID: " + packet.getPacketId());
+			Pixxel.getServer().getLogger().log(Level.SEVERE, "Packet was not able to be sent to Queue! Packet ID: " + packet.getPacketId());
 		}
 	}
 	
 	public Packet getNextPacket() {
 		if (this.peek() == null)
-			System.out.println("ERROR: Packet at head of queue is null!");
+			Pixxel.getServer().getLogger().log(Level.SEVERE, "Packet at head of queue is null!");
 		return this.poll();
 	}
 }

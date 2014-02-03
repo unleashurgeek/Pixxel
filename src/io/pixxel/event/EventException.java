@@ -1,6 +1,7 @@
 package io.pixxel.event;
 
 public class EventException extends Exception {
+	private static final long serialVersionUID = -4320900828731677284L;
 	
 	private final Throwable cause;
 	

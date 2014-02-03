@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.error.YAMLException;
 
+import io.pixxel.Pixxel;
 import io.pixxel.PixxelServer;
 import io.pixxel.event.Event;
 import io.pixxel.event.EventException;
@@ -262,7 +263,7 @@ public final class PluginLoader {
 			try {
 				pPlugin.setEnabled(true);
 			} catch (Throwable ex) {
-				System.out.println("Error occured while enabling " + plugin.getDescription().getFullName() + " (Is it up to date?)");
+				Pixxel.getServer().getLogger().log(Level.SEVERE, "Error occured while enabling " + plugin.getDescription().getFullName() + " (Is it up to date?)");
 			}
 			
 			server.getPluginManager().callEvent(new PluginEnableEvent(plugin));
@@ -286,7 +287,7 @@ public final class PluginLoader {
 			try {
 				pPlugin.setEnabled(false);
 			} catch (Throwable ex) {
-				System.out.println("Error ocured while disabling " + plugin.getDescription().getFullName());
+				Pixxel.getServer().getLogger().log(Level.SEVERE, "Error ocured while disabling " + plugin.getDescription().getFullName());
 			}
 			
 			loaders.remove(pPlugin.getDescription().getName());
